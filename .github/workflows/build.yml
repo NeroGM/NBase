@@ -20,10 +20,8 @@ jobs:
       - run: haxe -version
       
       - name: Installing heaps
-      - run: |
-          haxelib install heaps
+      - run: haxelib install heaps
       
       - run: cd tpl/
       
-      - name: JS Build  
       - run: haxe compile_js.hxml
