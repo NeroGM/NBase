@@ -1,4 +1,4 @@
-name: Build
+name: "Build Test: Javascript"
 
 on:
   push:
@@ -22,7 +22,8 @@ jobs:
         run: |
           haxelib git heaps https://github.com/HeapsIO/heaps
           haxelib install ase
-      - name: repo as 'nbase[dev]'
+      
+      - name: Set the repo as development directory
         run: |
           cd ../
           haxelib dev nbase nbase
