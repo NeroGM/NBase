@@ -1,0 +1,60 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "hl",
+            "name": "HashLink (SDL)",
+            "hl": "C:/HashLink/hl-1.12.0-win/hl.exe",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/build/sdl",
+            "preLaunchTask": "HL/JIT SDL",
+            "program": "game.hl"
+        },
+        {
+            "type": "hl",
+            "name": "HashLink (DX)",
+            "hl": "C:/HashLink/hl-1.12.0-win/hl.exe",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/build/dx",
+            "preLaunchTask": "HL/JIT DX",
+            "program": "game.hl"
+        },
+        {
+            "type": "hl",
+            "name": "NeroHL (SDL)",
+            "hl": "C:/HashLink/nerohl-0.1.0-win/hl.exe",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/build/sdl",
+            "preLaunchTask": "NHL/JIT SDL",
+            "program": "game.hl"
+        },
+        {
+            "type": "hl",
+            "name": "NeroHL (DX)",
+            "hl": "C:/HashLink/nerohl-0.1.0-win/hl.exe",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/build/dx",
+            "preLaunchTask": "NHL/JIT DX",
+            "program": "game.hl"
+        },
+        {
+			"type": "chrome",
+			"request": "launch",
+            "name": "Chrome",
+			"url": "${workspaceFolder}/build/js/game.html",
+            "webRoot": "${workspaceFolder}/build/js",
+            "preLaunchTask": "haxe: compile_js.hxml"
+		},
+        {
+			"type": "chrome",
+			"request": "launch",
+            "name": "Chrome (localhost,php)",
+			"url": "http://localhost:8000/build/js_php/game.php",
+            "webRoot": "${workspaceFolder}/build/js_php",
+            "preLaunchTask": "haxe: compile_js_php.hxml"
+		}
+    ]
+}

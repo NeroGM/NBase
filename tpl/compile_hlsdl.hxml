@@ -1,0 +1,3 @@
+-hl "build/sdl/game.hl"
+-lib hlsdl
+config.hxml

@@ -1,0 +1,53 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558 
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "haxe: active configuration",
+            "type": "haxe",
+            "args": "active configuration",
+            "problemMatcher": [ "$haxe-absolute", "$haxe", "$haxe-error", "$haxe-trace" ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "haxe: compile_js.hxml",
+            "type": "hxml",
+            "file": "compile_js.hxml",
+            "problemMatcher": [ "$haxe-absolute", "$haxe", "$haxe-error", "$haxe-trace" ]
+        },
+        {
+            "label": "haxe: compile_js_php.hxml",
+            "type": "hxml",
+            "file": "compile_js_php.hxml",
+            "problemMatcher": [ "$haxe-absolute", "$haxe", "$haxe-error", "$haxe-trace" ]
+        },
+        {
+            "label": "HL/JIT SDL",
+            "command": "haxe",
+            "args": [ "compile_hlsdl.hxml" ],
+            "problemMatcher": [ "$haxe-absolute", "$haxe", "$haxe-error", "$haxe-trace" ]
+        },
+        {
+            "label": "HL/JIT DX",
+            "command": "haxe",
+            "args": [ "compile_hldx.hxml" ],
+            "problemMatcher": [ "$haxe-absolute", "$haxe", "$haxe-error", "$haxe-trace" ]
+        },
+        {
+            "label": "NHL/JIT SDL",
+            "command": "haxe",
+            "args": [ "compile_nhlsdl.hxml" ],
+            "problemMatcher": [ "$haxe-absolute", "$haxe", "$haxe-error", "$haxe-trace" ]
+        },
+        {
+            "label": "NHL/JIT DX",
+            "command": "haxe",
+            "args": [ "compile_nhldx.hxml" ],
+            "problemMatcher": [ "$haxe-absolute", "$haxe", "$haxe-error", "$haxe-trace" ]
+        }
+    ]
+}

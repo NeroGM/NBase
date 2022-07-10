@@ -1,0 +1,12 @@
+{
+  "name": "NBase",
+  "url" : "https://github.com/NeroGM/NBase",
+  "license": "Public",
+  "tags": ["game", "heaps", "cross"],
+  "description": "A library powered by Heaps for making games.",
+  "version": "0.1.0",
+  "contributors": ["NeroGM"],
+  "dependencies": { "heaps" : "", "ase" : "" },
+
+  "releasenote": "The First Release - 10 July 2022"
+}

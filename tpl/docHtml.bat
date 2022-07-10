@@ -1,0 +1,1 @@
+haxelib run dox -i docs/ -o documentation/ -ex src -ex sys -ex format

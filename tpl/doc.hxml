@@ -1,0 +1,7 @@
+-D doc-gen
+-lib nbase
+--macro include('nb')
+--macro addGlobalMetadata("h2d.Object","@:build(nb.Macros.extH2dObject())")
+--no-output
+
+-xml docs/nb.xml

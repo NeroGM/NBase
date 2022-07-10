@@ -1,0 +1,3 @@
+-hl "build/dx/game.hl"
+-lib hldx
+config.hxml
