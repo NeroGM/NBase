@@ -21,7 +21,7 @@ jobs:
       
       - run: haxelib install heaps
       
-      - run: |
+      - name: Building Javascript
+        run: |
           cd tpl/
-          haxe --wait 6000
-          haxe compile_js.hxml
+          haxe basic.hxml -js "build/js/game.js" -m Main --macro MacroInit.init() --macro addGlobalMetadata('h2d.Object','@:build(nb.Macros.extH2dObject())')
