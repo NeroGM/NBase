@@ -17,7 +17,12 @@ jobs:
       - uses: krdlab/setup-haxe@v1
         with:
           haxe-version: 4.2.5
+      - run: haxe -version
+      
+      - name: Installing heaps
       - run: |
-          haxe -version
           haxelib install heaps
-          haxe tpl/compile_js.hxml
+      
+      - run : cd tpl/
+      - name: JS Build  
+          haxe compile_js.hxml
