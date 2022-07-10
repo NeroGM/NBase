@@ -27,5 +27,5 @@ jobs:
       - name: Building Javascript
         run: |
           cd tpl/
-          haxe basic.hxml -js "build/js/game.js" -m Main --macro MacroInit.init() --macro addGlobalMetadata('h2d.Object','@:build(nb.Macros.extH2dObject())')
+          haxe -lib heaps -lib ase -js "build/js/game.js" -m Main --macro MacroInit.init() --macro addGlobalMetadata('h2d.Object','@:build(nb.Macros.extH2dObject())')
         shell: cmd
