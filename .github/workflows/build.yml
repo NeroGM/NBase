@@ -17,12 +17,12 @@ jobs:
       - uses: krdlab/setup-haxe@v1
         with:
           haxe-version: 4.2.5
-      - run: haxe -version
       
       - name: Installing Heaps + Ase
         run: |
           haxelib install heaps
           haxelib install ase
+          haxelib dev nbase
       
       - name: Building Javascript
         run: |
