@@ -22,6 +22,9 @@ jobs:
         run: |
           haxelib install heaps
           haxelib install ase
+      - name: repo as 'nbase[dev]'
+        run: |
+          cd ../
           haxelib dev nbase
       
       - name: Building Javascript
