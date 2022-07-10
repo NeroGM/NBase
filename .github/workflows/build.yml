@@ -21,6 +21,6 @@ jobs:
       
       - run: haxelib install heaps
       
-      - run: cd tpl/
-      
-      - run: haxe compile_js.hxml
+      - run: |
+          cd tpl/
+          haxe compile_js.hxml
