@@ -25,7 +25,7 @@ jobs:
       - name: repo as 'nbase[dev]'
         run: |
           cd ../
-          haxelib dev nbase
+          haxelib dev nbase nbase
       
       - name: Building Javascript
         run: |
