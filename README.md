@@ -1,5 +1,8 @@
 # NBase
 
+![License: CC0-1.0](https://img.shields.io/github/license/NeroGM/NBase?color=e6e6e6&label=License)
+![Haxelib](https://img.shields.io/github/v/release/NeroGM/NBase?color=ea8220&label=Haxelib)
+
 ## Installation
 
 You must have [Haxe](https://haxe.org) installed.
