@@ -14,7 +14,14 @@ haxelib install NBase
 
 To make desktop apps [get a release of HashLink](https://github.com/HaxeFoundation/hashlink/releases) (or build one on Linux).
 
-Put the release in a folder so that your project's can find the executable. See `".vscode/launch.json"`.
+Put the release in a folder so that your project can find the executable. See `".vscode/launch.json"`.
+
+Installing hashlink dependencies:
+```
+haxelib install hlopenal
+haxelib install hlsdl
+haxelib install hldx
+```
 
 ## Quick start a project
 
