@@ -4,9 +4,9 @@
   "license": "Public",
   "tags": ["game", "heaps", "cross"],
   "description": "A library powered by Heaps for making games.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "contributors": ["NeroGM"],
-  "dependencies": { "heaps":"git", "ase":"2.0.1" },
+  "dependencies": { "heaps":"", "ase":"2.0.1" },
 
-  "releasenote": "The First Release - 10 July 2022"
+  "releasenote": "Patch - 12 July 2022"
 }
