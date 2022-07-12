@@ -41,6 +41,4 @@ See that you're "launch.json" file is correctly configured to run and debug dire
 
 [NBase Documentation](https://nerogm.github.io/NBase/tpl/documentation/nb/index.html) | [Heaps Wiki](https://github.com/HeapsIO/heaps/wiki)
 
-----
-
 [The Haxe Discord](https://discordapp.com/invite/0uEuWH3spjck73Lo) | [My Discord](https://discord.gg/yb2Ej6YsE3) | [Twitter](https://twitter.com/home) | [Patreon](https://www.patreon.com/NeroGM) | [Ko-fi](https://ko-fi.com/nerogm)
