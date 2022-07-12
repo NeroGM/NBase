@@ -1,8 +1,8 @@
-# NBase
-
 [![License: CC0-1.0](https://img.shields.io/github/license/NeroGM/NBase?color=e6e6e6&label=License)](https://creativecommons.org/publicdomain/zero/1.0/)
 [![Haxelib](https://img.shields.io/github/v/release/NeroGM/NBase?color=ea8220&label=Haxelib)](https://lib.haxe.org/p/NBase/)
 [![Build Test: Javascript](https://github.com/NeroGM/NBase/actions/workflows/build_js.yml/badge.svg)](https://github.com/NeroGM/NBase/actions/workflows/build_js.yml)
+
+<img src="https://svgshare.com/i/j2Y.svg" alt="NBase Logo" width="300">
 
 ## Installation
 
