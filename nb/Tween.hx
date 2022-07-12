@@ -25,19 +25,20 @@ enum TweenType {
  * 
  * @since 0.1.0
  **/
+@:allow(nb.Tween)
 class TweenVar {
     /** The starting value. **/
-    public var startV:Float;
+    public var startV(default,null):Float;
     /** The destination value. **/
-    public var to:Float;
+    public var to(default,null):Float;
     /** The total time the tweening operation will take. **/
-    public var tMax:Float;
+    public var tMax(default,null):Float;
     /** The current value. **/
-    public var v:Float;
+    public var v(default,null):Float;
     /** Time elpased, in seconds. **/
-    public var realT:Float = 0;
+    public var realT(default,null):Float = 0;
     /** The t value, between 0 and 1. **/
-    public var t:Float = 0;
+    public var t(default,null):Float = 0;
     /** The difference between the starting value and the destination value, `to-startV`. **/
     private var diff:Float;
 
@@ -99,7 +100,7 @@ class TweenVar {
  **/
 class Tween {
     /** Contains all current tween processes. **/
-    public static var twVars:Array<TweenVar> = [];
+    public static var twVars(default,null):Array<TweenVar> = [];
     
     // Constant values
     private static inline var c1:Float = 1.70158;

@@ -14,9 +14,9 @@ class SubScene extends Object {
     /** The y coordinate of the view of the scene. **/
     public var sy:Float = 0;
     /** The scene it is displaying. **/
-    public var scene:Scene;
+    public var scene(default,null):Scene;
     /** The scene it is showing from. **/
-    public var parentScene:Scene;
+    public var parentScene(default,null):Scene;
     /** The tile of the render target. **/
     private var tile:h2d.Tile;
     /** The render target texture. **/
@@ -24,7 +24,7 @@ class SubScene extends Object {
     /** The `h2d.Bitmap` displaying the tile. **/
     private var bmp:h2d.Bitmap;
     /** This subscene's interactive. **/
-    public var inter:Interactive;
+    public var inter(default,null):Interactive;
     /** Set to `true` when a subscene is in the process of being a copy. **/
     private static var copying:Bool = false;
 

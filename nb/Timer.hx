@@ -116,17 +116,18 @@ class ConditionalF {
  * 
  * @since 0.1.0
  **/
+@:allow(nb.Timer)
 class UpdateF {
     /** A name to identify this instance. **/
 	public var name:String;
     /** The function to be executed every frame. Will have this instance as argument. **/
 	public var f:UpdateF->Void;
     /** The amount of time elapsed, in seconds. **/
-	public var tElapsed:Float;
+	public var tElapsed(default,null):Float;
     /** When this function returns `true`, `f` stops being executed. **/
 	public var endCondition:Void->Bool;
     /** The amount of frames elapsed. **/
-	public var tFrames:Int;
+	public var tFrames(default,null):Int;
 
     /**
      * Creates an `nb.Timer.UpdateF` instance.

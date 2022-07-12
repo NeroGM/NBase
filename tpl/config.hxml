@@ -1,6 +1,6 @@
 basic.hxml
 -m Main
 --macro MacroInit.init()
---macro addGlobalMetadata("h2d.Object","@:build(nb.Macros.extH2dObject())")
+--macro addGlobalMetadata('h2d.Object','@:build(nb.Macros.extH2dObject())')
 -dce full
 debug.hxml

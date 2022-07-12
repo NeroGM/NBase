@@ -65,30 +65,30 @@ class AnimData {
  **/
 class Sprite extends Object {
     /** This sprite's associated `h3d.mat.Texture`. **/
-    public var tex:Texture;
+    public var tex(default,null):Texture;
     /** This sprite's associated `h2d.SpriteBatch`. **/
-    public var sb:h2d.SpriteBatch;
+    public var sb(default,null):h2d.SpriteBatch;
     /**
      * The tiles associated with this sprite.
      * 
      * Example: `tiles[1][3]` returns the tile used for displaying the 3rd layer of the 1st frame.
      **/
-    public var tiles:Array<Array<h2d.Tile>> = [];
+    public var tiles(default,null):Array<Array<h2d.Tile>> = [];
     /**
      * The `h2d.SpriteBatch.BatchElement` associated with this sprite.
      * 
      * Example: `elements[2][1]` returns the element used for displaying the 1st layer of the 2nd frame.
      **/
-    public var elements:Array<Array<h2d.SpriteBatch.BatchElement>> = [];
+    public var elements(default,null):Array<Array<h2d.SpriteBatch.BatchElement>> = [];
     /** The `nb.Atlas` associated with this sprite. **/
-    public var atlas:Atlas;
+    public var atlas(default,null):Atlas;
     /** Contains all animations used for this sprite. **/
     public var animations:Array<AnimData> = [];
 
     /** The current animation data this sprite is using. **/
-    public var currentAnimation:AnimData;
+    public var currentAnimation(default,null):AnimData;
     /** The frame index of the frame being displayed. **/
-	public var frame(default, null):Int = 0;
+	public var frame(default,null):Int = 0;
     /** A time in seconds before going to the next frame. **/
 	public var animC(default,null):Float = 0;
     /** The current animation frame index. **/

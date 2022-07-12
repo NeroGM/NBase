@@ -47,17 +47,17 @@ class Scene extends h2d.Scene {
 	/** Whether this scene is loaded. **/
 	public var firstLoaded(default, null):Bool = false;
 	/** The background interactive of this scene. **/
-	public var inter:Interactive;
+	public var inter(default,null):Interactive;
 	/** Contains all `nb.SubScene` instances in this scene. **/
-	public var subScenes:Array<SubScene> = [];
+	public var subScenes(default,null):Array<SubScene> = [];
 	/** Contains all `nb.SubScene` instances this scene is a parent of. **/
-	public var relSubScenes:Array<SubScene> = [];
+	public var relSubScenes(default,null):Array<SubScene> = [];
 	/** Contains the `nb.Scene` instances this scene can see through subscenes. **/
-	public var canSeeScenes:Array<Scene> = [];
+	public var canSeeScenes(default,null):Array<Scene> = [];
 	/** Contains the `nb.Scene` instances this scene can be see from. **/
-	public var seenByScenes:Array<Scene> = [];
+	public var seenByScenes(default,null):Array<Scene> = [];
 	/** This scene's current main camera. **/
-	public var cam:Camera;
+	public var cam(default,null):Camera;
 	/** All cameras for this scene. **/
 	public final cams:Array<Camera> = []; // not fully implemented
 	/**
