@@ -4,9 +4,12 @@
   "license": "Public",
   "tags": ["game", "heaps", "cross"],
   "description": "A library powered by Heaps for making games.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "contributors": ["NeroGM"],
-  "dependencies": { "heaps":"", "ase":"2.0.1" },
+  "dependencies": {
+    "heaps":"git:https://github.com/HeapsIO/heaps#d9880006b83982",
+    "ase":"git:https://github.com/miriti/ase#8726e7d2810a"
+  },
 
-  "releasenote": "Patch - 12 July 2022"
+  "releasenote": "Patch - 13 July 2022 (See CHANGELOG.md for details)"
 }
