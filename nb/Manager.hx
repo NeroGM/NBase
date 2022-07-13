@@ -59,7 +59,6 @@ class Manager {
 
 	/** All `nb.Scene`s instances active. **/
 	public static var createdScenes:Array<Scene> = [];
-	public static var loaded:Bool = false;
 	
 	/** Initializes this class. It needs to be done once before being used and have `neroFS` set. **/
 	public static function init(app:hxd.App, ?w:Int=300, ?h:Int=300, onFinished:Void->Void) {
@@ -84,9 +83,7 @@ class Manager {
 					app.setScene(currentScene);
 					initWindowEventTarget();
 					
-					initialised = true;
-					
-					loaded = true;
+					initialised = true;					
 					onFinished();
 				});
 			});
@@ -204,7 +201,7 @@ class Manager {
 		#if (hlsdl || hldx) if (!eventJustTriggered && currentScene != null) @:privateAccess currentScene.additionalInteractivesCheck(); #end
 		Timer.threadUpdate(dt);
 
-		if (!loaded) return;
+		if (!initialised) return;
 
 		if (neroFS != null) neroFS.update(dt);
 

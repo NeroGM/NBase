@@ -155,7 +155,7 @@ enum BorderType {
  **/
 class Graphics extends Object {
     /** The `h2d.Graphics` used for drawing. **/
-    public var g:h2d.Graphics;
+    public var g(default, null):h2d.Graphics;
     /** This instance's default drawing parameters. **/
     public var params:DrawingParams;
 

@@ -8,25 +8,25 @@ import nb.shape.*;
  * @since 0.1.0
  **/
  // ! check size behavior
+@:allow(nb.Scene)
 class Interactive extends Object {
 	/** The z value of the interactive. **/
 	public var z:Int = 0;
 	/** The second z value of the interactive to sort interactives with the same `z` value. **/
 	public var z2:Int = 0;
 	/** If `true`, this interactive is currently the topmost interactive targeted by mouse events. **/
-	public var isHighestZ:Bool = false;
+	public var isHighestZ(default, null):Bool = false;
 	/** Whether this interactive should let the interactives below it to trigger their events. **/
 	public var propagate:Bool = false;
 	/**
 	 * Whether this interactive is currently focused.
 	 * It can be prevented from being automatically set with `autoFocus`.
 	 **/
-	public var focused:Bool = false;
+	public var focused(default, null):Bool = false;
 	/** Which mouse buttons is currently triggering this interactive. **/
-	public var pushed:Array<Int> = [];
-	public var keyPushed:Bool = false;
+	public var pushed(default, null):Array<Int> = [];
 	/** Whether the mouse is over this interactive. Can be blocked by `propagate`. **/
-	public var over:Bool = false;
+	public var over(default, null):Bool = false;
 	/** Whether this interactive can be triggered. **/
 	public var enabled(default, null):Bool = true;
 	/** Whether this interactive gets focused/unfocused automatically on mouse click. **/
@@ -35,9 +35,9 @@ class Interactive extends Object {
 	/** The `nb.shape.Shapes` defining this interactive's hitboxes. You can add shapes to it directly. **/
 	public var shapes(default,null):Shapes = null;
 	/** Whether this interactive's parent is a `nb.SubScene`. Permits the event to go to the subscene. **/
-	public var isOnSubscene:Bool = false;
+	public var isOnSubscene(default, null):Bool = false;
 
-	public static var focusedInteractives:Array<Interactive> = [];
+	public static var focusedInteractives(default, null):Array<Interactive> = [];
 
 	/** The `nb.Scene` this interactive is on. **/
 	private var scene:Scene;

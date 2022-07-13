@@ -157,7 +157,7 @@ class Key {
 	 * Contains key IDs that will be ignored until next frame. Ignored keys never returns
 	 * `true` from this class's functions, but they are still detected and stored in this class's variables.
 	 **/
-	public static var ignoredKeys:Array<Int> = [];
+	public static var ignoredKeys(default, null):Array<Int> = [];
 	
 	/** Checks whether a key/mouse button was just pressed. Example: `nb.Key.isPressed(nb.Key.MOUSE_LEFT)`. **/
 	public static function isPressed(code:Int):Bool
