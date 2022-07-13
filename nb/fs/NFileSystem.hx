@@ -304,16 +304,16 @@ class NFileSystem implements FileSystem {
 	#end
 
 	/** Contains all the `Address`es and `DataFileInfo`s. **/
-	public var resInfos:ResInfos;
+	public var resInfos(default,null):ResInfos;
 	/** Contains all loaded data files. **/
-	public var loadedDataFiles:Array<DataFile> = [];
+	public var loadedDataFiles(default,null):Array<DataFile> = [];
 	/** Contains all created `NFileEntry`s. **/
-	public var fileEntries:Array<NFileEntry> = [];
+	public var fileEntries(default,null):Array<NFileEntry> = [];
 	/** Paths relative to the project's resource directory that will be ignored when looking for new or updated resources. **/
 	public var resPathsToSkip:Array<String> = [];
 
 	/** Contains freed addresses. A free `Address` refers to data in the data file that is allowed to be overwritten. **/
-	public var freeAddresses:MapArray<Array<Float>> = new MapArray();
+	public var freeAddresses(default,null):MapArray<Array<Float>> = new MapArray();
 	/** Next id to assign to a free data. **/
 	private var nextFreeId:Int = 0;
 	/** If `true`, files will be loaded automatically in memory when their data are being accessed. **/
@@ -321,7 +321,7 @@ class NFileSystem implements FileSystem {
 	/** Adds files to `watchedFiles` automatically when they are loaded. **/
 	public var autoWatchFiles:Bool = true;
 	/** Files to check for hot-reloading. **/
-	public var watchedFiles:Array<NFileEntry> = [];
+	public var watchedFiles(default,null):Array<NFileEntry> = [];
 	/** Maximum size of a data file. A number <= 0 means there's no limit. **/
 	public var maxSizePerFile:Int = -1;
 	/** Check watched files every X seconds. **/
@@ -617,7 +617,7 @@ class NFileSystem implements FileSystem {
 		#if target.threaded }); #end
 		#end
 
-		#if js
+		#if (js && serv)
 		var a:Array<{path:String,mTime:Float}> = [for (file in watchedFiles) { path:file.path, mTime:file.mTime } ];
 		var headers = new js.html.Headers();
 		headers.append("Accept",'application/json, text/plain, */*');
