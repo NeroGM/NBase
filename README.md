@@ -4,6 +4,8 @@
 
 <p align="center"><img src="https://svgshare.com/i/j2Y.svg" alt="NBase Logo" width="50%"/></p>
 
+NBase is a framework/engine built on top of [Heaps](https://heaps.io).
+
 ## Installation
 
 You must have [Haxe](https://haxe.org) installed.
@@ -15,7 +17,7 @@ haxelib install NBase
 
 To make desktop apps [get a release of HashLink](https://github.com/HaxeFoundation/hashlink/releases). If you can't find Linux/Mac releases, check [the latest release](https://github.com/HaxeFoundation/hashlink/releases/tag/latest).
 
-Put the release in a folder so that your project can find the executable. See `".vscode/launch.json"`.
+Put the release in a folder so that your project can find the executable. (See `".vscode/launch.json"`.)
 
 Install hashlink dependencies:
 ```
