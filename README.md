@@ -2,7 +2,7 @@
 [![Haxelib](https://img.shields.io/github/v/release/NeroGM/NBase?color=ea8220&label=Haxelib)](https://lib.haxe.org/p/NBase/)
 [![Build Test: Javascript](https://github.com/NeroGM/NBase/actions/workflows/build_js.yml/badge.svg)](https://github.com/NeroGM/NBase/actions/workflows/build_js.yml)
 
-<p align="center"><img src="https://svgshare.com/i/j2Y.svg" alt="NBase Logo" width="50%"/></p>
+<p align="center"><img src="https://svgshare.com/i/j2Z.svg" alt="NBase Logo" width="50%"/></p>
 
 NBase is a framework/engine built on top of [Heaps](https://heaps.io).
 
