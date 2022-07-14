@@ -1,10 +1,12 @@
-[![License: CC0-1.0](https://img.shields.io/github/license/NeroGM/NBase?color=e6e6e6&label=License)](https://creativecommons.org/publicdomain/zero/1.0/)
-[![Haxelib](https://img.shields.io/github/v/release/NeroGM/NBase?color=ea8220&label=Haxelib)](https://lib.haxe.org/p/NBase/)
+[![License: CC0-1.0](https://img.shields.io/github/license/NeroGM/NBase?color=e6e6e6&label=License&logo=creative-commons&logoColor=ffffff)](https://creativecommons.org/publicdomain/zero/1.0/)
+[![Haxelib](https://img.shields.io/github/v/release/NeroGM/NBase?color=ea8220&label=Haxelib&logo=haxe)](https://lib.haxe.org/p/NBase/)
 [![Build Test: Javascript](https://github.com/NeroGM/NBase/actions/workflows/build_js.yml/badge.svg)](https://github.com/NeroGM/NBase/actions/workflows/build_js.yml)
 
 <p align="center"><img src="https://svgshare.com/i/j2Z.svg" alt="NBase Logo" width="50%"/></p>
 
-NBase is a framework/engine built on top of [Heaps](https://heaps.io).
+NBase is a game framework/engine built on top of [Heaps](https://heaps.io). Heaps is the engine behind cross-platform games like Dead Cells, Evoland, Northgard and Dune.
+
+[Introduction](https://github.com/NeroGM/NBase/wiki/Introduction) - [Supported Platforms](https://github.com/NeroGM/NBase/wiki/Supported-platforms)
 
 ## Installation
 
@@ -35,12 +37,19 @@ haxelib run nbase [ProjectName]
 
 ## Compilation
 
-Compile your app using the corresponding `haxe compile_X.hxml`. For example, use `haxe compile_js.hxml` for javascript build.
+Compile your app using the corresponding `haxe compile_X.hxml`. For example, use `haxe compile_js.hxml` to build a javascript file, then launch `"build/js/index.html"`.
 
-See that you're "launch.json" file is correctly configured to run and debug directly from VS Code.
+Or you can run and debug directly from VS Code if your `".vscode/launch.json"` is correctly configured.
 
-## Links
+## Learn
 
-[NBase Documentation](https://nerogm.github.io/NBase/tpl/documentation/nb/index.html) | [Heaps Wiki](https://github.com/HeapsIO/heaps/wiki)
+[API Documentation](https://nerogm.github.io/NBase/tpl/documentation/nb/index.html) | [NBase Wiki](https://github.com/NeroGM/NBase/wiki) | [Heaps Wiki](https://github.com/HeapsIO/heaps/wiki)
 
-[The Haxe Discord](https://discordapp.com/invite/0uEuWH3spjck73Lo) | [My Discord](https://discord.gg/yb2Ej6YsE3) | [Twitter](https://twitter.com/home) | [Patreon](https://www.patreon.com/NeroGM) | [Ko-fi](https://ko-fi.com/nerogm)
+## Follow & Support
+
+[Twitter](https://twitter.com/Nero__GM) | [Patreon](https://www.patreon.com/NeroGM) | [Ko-fi](https://ko-fi.com/nerogm)
+
+## Community
+
+[![Haxe Discord](https://img.shields.io/discord/162395145352904705?label=Haxe%20Discord&logo=discord)](https://discordapp.com/invite/sWCGm33)
+[![NeroGM's Discord](https://img.shields.io/discord/770699254611836939?label=NeroGM's%20Discord&logo=discord)](https://discord.gg/yb2Ej6YsE3)
