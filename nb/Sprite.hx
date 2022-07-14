@@ -105,8 +105,8 @@ class Sprite extends Object {
      * Creates an `nb.Sprite` instance.
      * 
      * @param x The instance's x coordinate.
-	 * @param y The instance's y coordinate.
-	 * @param parent The instance's parent object.
+     * @param y The instance's y coordinate.
+     * @param parent The instance's parent object.
      **/
     override public function new(x:Float=0, y:Float=0, ?parent:h2d.Object) {
         super(x,y,parent);
