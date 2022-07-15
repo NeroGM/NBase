@@ -27,9 +27,14 @@ jobs:
         run: |
           cd ../
           haxelib dev nbase nbase
-      
-      - name: Building Javascript
+        
+      - name: Create test project
         run: |
-          cd tpl/
+          cd ../
+          haxelib run nbase test
+      
+      - name: 'Building: Javascript'
+        run: |
+          cd ../test/
           haxe basic.hxml -js "build/js/game.js" -m Main --macro MacroInit.init() --macro addGlobalMetadata('h2d.Object','@:build(nb.Macros.extH2dObject())')
         shell: cmd
