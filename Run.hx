@@ -33,6 +33,7 @@ class Run {
         var paths:Array<String> = [""];
         var ignorePaths:Array<String> = ["documentation","docs","dump","doc.hxml","docHtml.bat"];
         for (path in paths) for (file in FS.readDirectory(tplDir+path)) {
+            if (file == ".gitignore") continue;
             var filePath = tplDir+path+file;
 
             var skip:Bool = false;
