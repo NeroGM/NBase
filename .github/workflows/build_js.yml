@@ -21,7 +21,7 @@ jobs:
       - name: Installing Heaps + Ase
         run: |
           haxelib git heaps https://github.com/HeapsIO/heaps
-          haxelib install ase
+          haxelib git ase https://github.com/miriti/ase
       
       - name: Set the repo as development directory
         run: |
