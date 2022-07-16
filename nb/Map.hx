@@ -222,5 +222,74 @@ typedef TiledPoint = {
 }
 
 class Map extends Object {
-    
+    public var tiledMap:TiledMap;
+    public var tileGroups:Array<h2d.TileGroup> = [];
+    public var atlas:Atlas = null;
+    public var atlasTile:h2d.Tile = null;
+	public function new(x:Float=0, y:Float=0, ?parent:nb.Object) {
+        super(x,y,parent);
+
+    }
+
+    public function loadTiledMap(resource:hxd.res.Resource, singleTileGroup:Bool=true) {
+		tiledMap = haxe.Json.parse(resource.entry.getText());
+        var directory = resource.entry.directory+"/";
+        var tilesets:Array<TiledTileset> = [for (tileset in tiledMap.tilesets) {
+            if (tileset.source != null) {
+                if (tileset.source.charAt(0) == ":") continue;
+                var ts:TiledTileset = haxe.Json.parse(hxd.Res.load(directory+tileset.source).entry.getText());
+                ts.firstgid = tileset.firstgid;
+                ts;
+            } else tileset;
+        }];
+
+        atlas = new Atlas();
+        for (tileset in tilesets) atlas.addImage(hxd.Res.load(directory+tileset.image).toImage(),tileset.name,RGBA);
+        atlas.make();
+        atlasTile = atlas.toTile();
+
+        var tg:h2d.TileGroup = null;
+        if (singleTileGroup) {
+            tg = new h2d.TileGroup(atlasTile);
+            tileGroups.push(tg);
+            addChild(tg);
+        }
+        
+        for (layer in tiledMap.layers) {
+            switch (layer.type) {
+                case "tilelayer":
+                    if (layer.data is Array == false) throw "Layer data isn't an Array.";
+
+                    var layerData = cast(layer.data,Array<Dynamic>);
+                    if (!singleTileGroup) {
+                        tg = new h2d.TileGroup(atlasTile);
+                        tileGroups.push(tg);
+                        if (layer.visible) addChild(tg);
+                    }
+
+                    for (y in 0...tiledMap.height) for (x in 0...tiledMap.width) {
+                        var data:Int = layerData[x + y * tiledMap.width];
+                        if (data == 0) continue;
+
+                        var fromTileset:TiledTileset = null;
+                        for (tileset in tilesets) {
+                            if (data >= tileset.firstgid && data < tileset.firstgid + tileset.tilecount) {
+                                fromTileset = tileset;
+                                break;
+                            }
+                        }
+                        if (fromTileset == null) throw "Couldn't find associated tileset.";
+
+                        var sd = atlas.getSubData(fromTileset.name);
+                        var id:Int = (data-fromTileset.firstgid);
+                        var cx:Int = Std.int(id%fromTileset.columns);
+                        var cy:Int = Std.int(id/fromTileset.columns);
+                        var xPos:Int = cx * fromTileset.tilewidth;
+                        var yPos:Int = cy * fromTileset.tileheight;
+                        var tile = atlasTile.sub(sd.x+xPos,sd.y+yPos,fromTileset.tilewidth,fromTileset.tileheight);
+                        tg.add(x*tiledMap.tilewidth,y*tiledMap.tileheight,tile);
+                    }
+            }
+        }
+    }
 }
