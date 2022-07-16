@@ -117,7 +117,7 @@ typedef TiledLayer = {
 
 typedef TiledChunk = {
     /** Array of unsigned int (GIDs) or base64-encoded data **/
-    var data:Array<String>;
+    var data:Dynamic;
     /** Height in tiles **/
     var height:Int;
     /** Width in tiles **/
