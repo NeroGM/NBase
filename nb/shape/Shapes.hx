@@ -3,36 +3,33 @@ package nb.shape;
 using nb.ext.PointExt;
 
 class Shapes extends Object {
-    public var a:Array<Shape> = [];
+    public var shapes:Array<Shape> = [];
     public var union:Array<Shape> = [];
     public var centroid:Point = null;
-    public var type:nb.shape.Shape.ShapeType;
+    public var types:Array<Shape.ShapeType>;
     public var center:Point = new Point();
 
-    // private var debugG:Graphics;
-    // private var gParams:Array<nb.Graphics.DrawingParams>;
+    public var debugG(default,null):Graphics;
     public function new(?parent:h2d.Object) {
         super(parent);
-        // debugG = new Graphics(0,0,this);
-        // gParams = Graphics.getDefaultParams();
-        // gParams[0].lineColor = 0xFFFFFF;
+        debugG = new Graphics(0,0,this);
     }
 
     // For now, should be used only for set of polygons
     public function addShape(shape:Shape) {
-        a.push(shape);
+        shapes.push(shape);
         addChild(shape);
         makeUnion();
-        updateParams();
+        updateFields();
     }
 
-    public function addShapes(a:Array<Shape>) {
-        for (shape in a) { this.a.push(shape); addChild(shape); }
+    public function addShapes(shapes:Array<Shape>) {
+        for (shape in shapes) { this.shapes.push(shape); addChild(shape); }
         makeUnion();
-        updateParams();
+        updateFields();
     }
 
-    public function updateParams() {
+    public function updateFields() {
         if (union.length == 0) return;
 
         centroid = null;
@@ -40,18 +37,18 @@ class Shapes extends Object {
         var leftP:Point = null;
         var topP:Point = null;
         var botP:Point = null;
-        if (centroid == null) for (pol in union) {
-            var rP = pol.getSupportPoint(new Point(1,0));
-            var lP = pol.getSupportPoint(new Point(-1,0));
-            var tP = pol.getSupportPoint(new Point(0,-1));
-            var bP = pol.getSupportPoint(new Point(0,1));
+        for (shape in union) {
+            var rP = shape.getSupportPoint(new Point(1,0));
+            var lP = shape.getSupportPoint(new Point(-1,0));
+            var tP = shape.getSupportPoint(new Point(0,-1));
+            var bP = shape.getSupportPoint(new Point(0,1));
             if (rightP == null || rightP.x < rP.x) rightP = rP;
             if (leftP == null || leftP.x > lP.x) leftP = lP;
             if (topP == null || topP.y > tP.y) topP = tP;
             if (botP == null || botP.y < bP.y) botP = bP;
 
-            if (centroid == null) centroid = pol.centroid.clone();
-            else centroid = centroid.add(pol.centroid).multiply(0.5);
+            if (centroid == null) centroid = shape.centroid.clone();
+            else centroid = centroid.add(shape.centroid).multiply(0.5);
         }
         
         setSize(Math.abs(rightP.x-leftP.x),Math.abs(topP.y-botP.y));
@@ -60,59 +57,55 @@ class Shapes extends Object {
     //    centroidToOrigin();
     //    trace(size);
 
-        type = (a.length == 1) ? a[0].type : COMPLEX;
+        types = shapes.length == 1 ? shapes[0].types.copy() : [COMPLEX];
     }
 
     public function containsPoint(p:Point):Bool {
-        for (shape in a) if (shape.containsPoint(p)) return true;
+        for (shape in shapes) if (shape.containsPoint(p)) return true;
         return false;
     }
 
+    // Moves all shapes so that centroid is 0,0
     public function centroidToOrigin() {
-        for (s in a) {
-            if (s.type == POLYGON) {
+        for (s in shapes) {
+            if (s is Polygon) {
                 var pol = cast(s,Polygon);
                 for (i in 0...pol.points.length) {
                     pol.points[i].sub(centroid);
-                } 
-            } else if (s.type == CIRCLE) {
+                }
+            } else if (s is Circle) {
                 var circ = cast(s,Circle);
                 circ.x -= centroid.x;
                 circ.y -= centroid.y;
-            }
+            } else throw "Unknown shape '" + s.toString() + "'"; 
         }
         centroid.set(0,0);
     }
 
     public function clear() {
-        for (s in a) s.remove();
+        for (s in shapes) s.remove();
         for (s in union) s.remove();
-        a = []; union = [];
+        shapes = []; union = [];
     }
 
-    public function getFarthestPoints():Array<Point> {
+    public function getFarthestPoints(fromCentroid:Bool=true):Array<Point> {
         var highestDist:Float = 0;
         var res:Array<Point> = [];
+        var fromP:Point = fromCentroid ? centroid : center;
         for (s in union) {
-            if (s.type == POLYGON) {
+            if (s is Polygon) {
                 for (p in cast(s,Polygon).points) {
-                    var dist = p.distance(center);
-                    if (dist == highestDist) res.push(p.sub(center));
-                    else if (dist > highestDist) { highestDist = dist; res = [p.sub(center)]; }
+                    var dist = p.distance(fromP);
+                    if (dist == highestDist) res.push(p.sub(fromP));
+                    else if (dist > highestDist) { highestDist = dist; res = [p.sub(fromP)]; }
                 } 
-            } else if (s.type == CIRCLE) {
+            } else if (s is Circle) {
                 var p = cast(s,Circle).getSupportPoint(new Point(1,0));
-                var dist = p.distance(center);
-                if (dist == highestDist) res.push(p.sub(center));
-                else if (dist > highestDist) { highestDist = dist; res = [p.sub(center)]; }
+                var dist = p.distance(fromP);
+                if (dist == highestDist) res.push(p.sub(fromP));
+                else if (dist > highestDist) { highestDist = dist; res = [p.sub(fromP)]; }
             }
         }
-        return res;
-    }
-
-    public static function withTransform(a:Array<Shape>, offset:Point):Array<Shape> {
-        var res:Array<Shape> = [];
-        for (s in a) res.push(s.withTransform(offset));
         return res;
     }
 
