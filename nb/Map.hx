@@ -1,69 +1,130 @@
 package nb;
 
 typedef TiledMap = {
+    /** Hex-formatted color (#RRGGBB or #AARRGGBB) (optional) **/
     var backgroundcolor:String;
+    /** The class of the map (since 1.9, optional) **/
     var _class:String;
+    /** The compression level to use for tile layer data (defaults to -1, which means to use the algorithm default) **/
     var compressionlevel:Int;
+    /** Number of tile rows **/
 	var height:Int;
+    /** Length of the side of a hex tile in pixels (hexagonal maps only) **/
     var hexsidelength:Int;
+    /** Whether the map has infinite dimensions **/
     var infinite:Bool;
+    /** Array of `TiledLayer`s **/
     var layers:Array<TiledLayer>;
+    /** Auto-increments for each layer **/
     var nextlayerid:Int;
+    /** Auto-increments for each placed object **/
     var nextobjectid:Int;
+    /** `"orthogonal"`, `"isometric"`, `"staggered"` or `"hexagonal"` **/
     var orientation:String;
+    /** X coordinate of the parallax origin in pixels (since 1.8, default: 0) **/
     var parallaxoriginx:Float;
+    /** Y coordinate of the parallax origin in pixels (since 1.8, default: 0) **/
     var parallaxoriginy:Float;
+    /** Array of `TiledProperty` **/
     var properties:Array<TiledProperty>;
+    /** `"right-down"` (the default), `"right-up"`, `"left-down"` or `"left-up"` (currently only supported for orthogonal maps) **/
     var renderorder:String;
+    /** `"x"` or `"y"` (staggered / hexagonal maps only) **/
     var staggeraxis:String;
+    /** `"odd"` or `"even"` (staggered / hexagonal maps only) **/
     var staggerindex:String;
+    /** The Tiled version used to save the file **/
     var tiledversion:String;
+    /** Map grid height **/
     var tileheight:Int;
+    /** Array of `TiledTileset` **/
     var tilesets:Array<TiledTileset>;
+    /** Map grid width **/
     var tilewidth:Int;
+    /** `map` (since 1.0) **/
     var type:String;
+    /** The JSON format version (previously a number, saved as string since 1.6) **/
     var version:String;
+    /** Number of tile columns **/
     var width:Int;
 }
 
 typedef TiledLayer = {
+    /** Array of chunks (optional). `type == "tilelayer"` only. **/
     var chunks:Array<TiledChunk>;
+    /** The class of the layer (since 1.9, optional) **/
     var _class:String;
+    /** `"zlib"`, `"gzip"`, `"zstd"` (since Tiled 1.3) or empty (default). `type == "tilelayer"` only. **/
     var compression:String;
+    /** Array of unsigned int (GIDs) or base64-encoded data(string). `type == "tilelayer"` only. **/
     var data:Dynamic;
+    /** `"topdown"` (default) or `"index"`. `type == "objectgroup"` only. **/
     var draworder:String;
+    /** `"csv"` (default) or `"base64"`. `type == "tilelayer"` only. **/
     var encoding:String;
+    /** Row count. Same as map height for fixed-size maps. **/
     var height:Int;
+    /** Incremental ID - unique across all layers **/
     var id:Int;
+    /** Image used by this layer. `type == "imagelayer"` only. **/
     var image:String;
+    /** Array of `TiledLayer`. `type == "group"` only. **/
     var layers:Array<TiledLayer>;
+    /** Whether layer is locked in the editor (default: false). (since Tiled 1.8.2) **/
     var locked:Bool;
+    /** Name assigned to this layer **/
     var name:String;
+    /** Array of `TiledObject`. `type == "objectgroup"` only. **/
     var objects:Array<TiledObject>;
+    /** Horizontal layer offset in pixels (default: 0) **/
     var offsetx:Float;
+    /** Vertical layer offset in pixels (default: 0) **/
     var offsety:Float;
+    /** Value between 0 and 1 **/
     var opacity:Float;
+    /** Horizontal [parallax factor](https://doc.mapeditor.org/en/stable/manual/layers/#parallax-factor) for this layer (default: 1). (since Tiled 1.5) **/
     var parallaxx:Float;
+    /** Vertical [parallax factor](https://doc.mapeditor.org/en/stable/manual/layers/#parallax-factor) for this layer (default: 1). (since Tiled 1.5) **/
     var parallaxy:Float;
+    /** Array of Properties **/
     var properties:Array<TiledProperty>;
+    /** Whether the image drawn by this layer is repeated along the X axis. `type == "imagelayer"` only. (since Tiled 1.8) **/
     var repeatx:Bool;
+    /** Whether the image drawn by this layer is repeated along the Y axis. `type == "imagelayer"` only. (since Tiled 1.8) **/
     var repeaty:Bool;
+    /** X coordinate where layer content starts (for infinite maps) **/
     var startx:Int;
+    /** Y coordinate where layer content starts (for infinite maps) **/
     var starty:Int;
+    /**
+     * Hex-formatted tint color (#RRGGBB or #AARRGGBB) that is multiplied with any graphics
+     * drawn by this layer or any child layers (optional).
+     **/
     var tintcolor:String;
+    /** Hex-formatted color (#RRGGBB) (optional). imagelayer only. **/
     var transparentcolor:String;
+    /** `"tilelayer"`, `"objectgroup"`, `"imagelayer"` or `"group"` **/
     var type:String;
+    /** Whether layer is shown or hidden in editor **/
     var visible:Bool;
+    /** Column count. Same as map width for fixed-size maps. **/
     var width:Int;
+    /** Horizontal layer offset in tiles. Always 0. **/
     var x:Int;
+    /** Vertical layer offset in tiles. Always 0. **/
     var y:Int;
 }
 
 typedef TiledChunk = {
+    /** Array of unsigned int (GIDs) or base64-encoded data **/
     var data:Array<String>;
+    /** Height in tiles **/
     var height:Int;
+    /** Width in tiles **/
     var width:Int;
+    /** X coordinate in tiles **/
     var x:Int;
+    /** Y coordinate in tiles **/
     var y:Int;
 }
 
