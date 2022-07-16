@@ -410,6 +410,11 @@ typedef TiledPoint = {
     var y:Float;
 }
 
+/**
+ * Displays a stage from a resource.
+ * 
+ * @since 0.2.0
+ **/
 class Map extends Object {
     /** The associated `TiledMap`. **/
     public var tiledMap:TiledMap;
