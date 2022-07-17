@@ -103,7 +103,7 @@ class Graph extends Object {
     /** Used in pathfinding. The nodes that the pathfinder had been on.  **/
     private var checkedNodes:Array<Node> = [];
     /** Used in pathfinding. The maximum loop count. **/
-    private var maxStep:Int = 1000;
+    private var defaultMaxStep:Int = 1000;
     /** The last path that the pathfinder made. **/
     public var lastPath:Array<Node> = [];
     private var currISearch:Int = -1; // ! ???
@@ -352,7 +352,7 @@ class Graph extends Object {
      * @return An array of `nb.Graph.Node` instances representing a path.
      **/
     public function path(start:Node, end:Node, ?maxStep:Null<Int>):Null<Array<Node>> {
-        if (maxStep != null) this.maxStep = maxStep;
+        if (maxStep == null) maxStep = this.defaultMaxStep;
         if (start == end) return [start];
 
         this.start = start;
