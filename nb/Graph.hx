@@ -117,7 +117,7 @@ class Graph extends Object {
     /** Used in pathfinding. The maximum loop count. **/
     private var defaultMaxStep:Int = 1000;
     /** The last path that the pathfinder made. **/
-    public var lastPath:Array<Node> = [];
+    public var lastPath(default,null):Array<Node> = [];
 
     /**
      * Whether this instance should track networks.
@@ -224,7 +224,7 @@ class Graph extends Object {
                 n.connections.remove(node);
 
                 if (trackNetworks) {
-                    var path = path(node,n);
+                    var path = path(node,n,null,true,false);
                     if (path == null || path[path.length-1] != n) {
                         var oneSingled:Bool = false;
                         if (node.connections.length == 0) {
@@ -361,31 +361,43 @@ class Graph extends Object {
      * @param start The node to start the path from.
      * @param end The node to end the path to.
      * @param maxStep The maximum number of steps/loop count.
+     * @param skipEvents Whether pathfinder events should be called.
+     * @param setLastPath Whether `lastPath` will be set to the resulting path.
      * @return An array of `nb.Graph.Node` instances representing a path.
      **/
-    public function path(start:Node, end:Node, ?maxStep:Null<Int>):Null<Array<Node>> {
+    public function path(start:Node, end:Node, ?maxStep:Null<Int>, skipEvents:Bool=false, updateVars:Bool=true):Null<Array<Node>> {
         if (maxStep == null) maxStep = this.defaultMaxStep;
         if (start == end) return [start];
 
-        this.start = start;
-        this.end = end;
-        currentNode = start;
-        calculatedNodes = [start];
-        checkedNodes = [start];
-        newCalcNodes = [];
+        var currentNode = start;
+        var calculatedNodes = [start];
+        var checkedNodes = [start];
+        var newCalcNodes = [];
         start.cost = 0;
 
-        onPathStart();
-        onCurrentNode(currentNode);
+        function doSetVars() {
+            this.start = start;
+            this.end = end;
+            this.currentNode = currentNode;
+            this.calculatedNodes = calculatedNodes;
+            this.checkedNodes = checkedNodes;
+            this.newCalcNodes = newCalcNodes;
+            this.lastPath = lastPath;
+        }
+
+        if (!skipEvents) {
+            onPathStart();
+            onCurrentNode(currentNode);
+        }
 
         var c:Int = 1;
         while (1 == 1) {
-            for (node in calculatedNodes) if (!newCalcNodes.contains(node)) onWasCalculated(node);
+            if (!skipEvents) for (node in calculatedNodes) if (!newCalcNodes.contains(node)) onWasCalculated(node);
 
             newCalcNodes = [];
             for (node in calcSurroundings(currentNode)) {
                 newCalcNodes.push(node);
-                onJustCalculated(node);
+                if (!skipEvents) onJustCalculated(node);
                 calculatedNodes.push(node);
                 calculatedNodes.sort((a,b)->{
                     if (getDistance(a,end)+a.cost < getDistance(b,end)+b.cost) return -1;
@@ -397,7 +409,7 @@ class Graph extends Object {
             for (i in 0...calculatedNodes.length) if (checkedNodes.indexOf(calculatedNodes[i]) == -1) {
                 currentNode = calculatedNodes[i];
                 checkedNodes.push(calculatedNodes[i]);
-                onCurrentNode(currentNode);
+                if (!skipEvents) onCurrentNode(currentNode);
                 break;
             }
 
@@ -406,10 +418,19 @@ class Graph extends Object {
             if (currentNode == end || c++ >= maxStep) {
                 var path:Array<Node> = [currentNode];
                 while (path[0] != start) path.insert(0,path[0].cameFrom);
-                return lastPath = path;
+                if (updateVars) doSetVars();
+                return path;
             }
         }
         return null;
+    }
+
+    public function getLastPathInfo() {
+        return {
+            start:this.start, end:this.end, currentNode:this.currentNode,
+            calculatedNodes:this.calculatedNodes, checkedNodes:this.checkedNodes,
+            newCalcNodes:this.newCalcNodes, lastPath:this.lastPath
+        }
     }
 
     /**
