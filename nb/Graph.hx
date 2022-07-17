@@ -490,6 +490,7 @@ class Graph extends Object {
         addChild(debugG);
     }
 
+    /** Assigns the nodes connected to `node` their "pathfinder values". **/
     private function calcSurroundings(node:Node):Array<Node> {
         var a:Array<Node> = [];
         for (con in node.connections) {
@@ -502,21 +503,35 @@ class Graph extends Object {
         return a;
     }
 
+    /** Returns a distance between two nodes. **/
     public dynamic function getDistance(n1:Node, n2:Node):Float return Math.abs(n2.x - n1.x) + Math.abs(n2.y - n1.y);
 
+    /**
+     * A saved connection logic.
+     *
+     * @param allNodes All nodes in this instance.
+     * @param newNode The node that was just added to this instance.
+     **/
     public dynamic function autoConnect(allNodes:Array<Node>, newNode:Node) { }
 
+    /** Called whenever two nodes connects. **/
     public dynamic function onConnect(node1:Node, node2:Node) { }
 
+    /** Called whenever two nodes disconnects. **/
     public dynamic function onDisconnect(node1:Node, node2:Node) { }
 
+    /** Called in pathfinding, at the start of the loop, when a node had its pathfinder values assigned in the previous loop. **/
     public dynamic function onWasCalculated(node:Node) { }
 
+    /** Called in pathfinding, when a node's pathfinder values was just assigned. **/
     public dynamic function onJustCalculated(node:Node) { }
 
+    /** Called in pathfinding, when the pathfinder goes on a node. **/
     public dynamic function onCurrentNode(node:Node) { }
 
+    /** Called when pathfinding start. **/
     public dynamic function onPathStart() { }
 
+    /** Called whenever a node moves. **/
     public dynamic function onNodeMove(node:Node) { }
 }
