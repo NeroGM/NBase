@@ -200,7 +200,8 @@ class Graph extends Object {
                 toNode.connections.push(node);
 
                 if (trackNetworks) {
-                    if (toNode.netId == 0) node.netId == 0 ? newNetwork(node,toNode) : { toNode.netId = node.netId; networks[0].remove(toNode); }
+                    if (toNode.netId == 0) node.netId == 0 ? newNetwork(node,toNode) : {
+                        toNode.netId = node.netId; networks[0].remove(toNode); networks[node.netId].push(toNode); }
                     else if (node.netId == 0) { node.netId = toNode.netId; networks[0].remove(node); networks[toNode.netId].push(node); }
                     else if (toNode.netId > node.netId) convertNetwork(node.netId, toNode.netId);
                     else if (toNode.netId < node.netId) convertNetwork(toNode.netId, node.netId);
