@@ -106,7 +106,6 @@ class Graph extends Object {
     private var defaultMaxStep:Int = 1000;
     /** The last path that the pathfinder made. **/
     public var lastPath:Array<Node> = [];
-    private var currISearch:Int = -1; // ! ???
 
     /**
      * Whether this instance should track networks.
@@ -438,7 +437,6 @@ class Graph extends Object {
         var checkedNodes:Array<Node> = [];
         var onNodes:Array<Node> = [allNodes[0]];
         var nextNodes:Array<Node> = [];
-        currISearch = currISearch > 2000000 ? 0 : currISearch+1;
         var uncheckedNodes:Array<Node> = trackNetworks ? [] : allNodes.copy(); // Unused if trackNetworks
         var checkedNetworksIds:Array<Int> = []; // Unused if !trackNetworks
         while (onNodes.length > 0) {
