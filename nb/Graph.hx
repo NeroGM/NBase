@@ -395,7 +395,7 @@ class Graph extends Object {
             if (!skipEvents) for (node in calculatedNodes) if (!newCalcNodes.contains(node)) onWasCalculated(node);
 
             newCalcNodes = [];
-            for (node in calcSurroundings(currentNode)) {
+            for (node in calcSurroundings(currentNode,calculatedNodes,end)) {
                 newCalcNodes.push(node);
                 if (!skipEvents) onJustCalculated(node);
                 calculatedNodes.push(node);
@@ -515,7 +515,7 @@ class Graph extends Object {
     }
 
     /** Assigns the nodes connected to `node` their "pathfinder values". **/
-    private function calcSurroundings(node:Node):Array<Node> {
+    private function calcSurroundings(node:Node, calculatedNodes:Array<Node>, end:Node):Array<Node> {
         var a:Array<Node> = [];
         for (con in node.connections) {
             if (calculatedNodes.indexOf(con) != -1 || !con.enabled) continue;
