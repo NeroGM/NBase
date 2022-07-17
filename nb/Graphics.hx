@@ -246,7 +246,7 @@ class Graphics extends Object {
 			var a = i * angle;
             var x = cx + Math.cos(a) * radius;
             var y = cy + Math.sin(a) * radius;
-			g.lineTo(x.equals(0) ? 0 : x, y.equals(0) ? 0 : y); // cuz drawn wrong when (cx,cy) close to (0,0) with h2d.Graphics' method.
+			g.lineTo(x.equals(0) ? 0 : x, y.equals(0) ? 0 : y); // cuz drawn wrong when (cx,cy) close to (0,0) with h2d.Graphics' method. // ! still happens but not at (0,0)
 		}
 
         g.lineStyle();
