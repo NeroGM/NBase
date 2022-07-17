@@ -439,8 +439,13 @@ class Graph extends Object {
         var onNodes:Array<Node> = [allNodes[0]];
         var nextNodes:Array<Node> = [];
         currISearch = currISearch > 2000000 ? 0 : currISearch+1;
+        var uncheckedNodes:Array<Node> = trackNetworks ? [] : allNodes.copy(); // Unused if trackNetworks
+        var checkedNetworksIds:Array<Int> = []; // Unused if !trackNetworks
         while (onNodes.length > 0) {
             for (onNode in onNodes) {
+                checkedNodes.push(onNode);
+                if (!trackNetworks) uncheckedNodes.remove(onNode);
+
                 if (onNode.connections.length > 0) {
                     var node1OnPath = lastPath.contains(onNode);
                     debugG.drawCircle(onNode.x, onNode.y, pointRadius, 0, node1OnPath ? params[0] : params[1]);
@@ -452,11 +457,23 @@ class Graph extends Object {
                 } else debugG.drawCircle(onNode.x, onNode.y, pointRadius, 0, params[2]);
 
                 onNode.addInteractive();
-                checkedNodes.push(onNode);
             }
 
             onNodes = nextNodes;
             nextNodes = [];
+
+            if (onNodes.length == 0 && checkedNodes.length != allNodes.length) {
+                if (trackNetworks) {
+                    checkedNetworksIds.push(checkedNodes[checkedNodes.length-1].netId);
+                    for (net in networks) if (!checkedNetworksIds.contains(net[0].netId)) {
+                        onNodes = [net[0]];
+                        break;
+                    }
+                    if (onNodes.length == 0) throw "Couldn't find supposed unchecked network."; // Should never happen
+                } else {
+                    onNodes = [uncheckedNodes[0]];
+                }
+            }
         }
 
         addChild(debugG);
