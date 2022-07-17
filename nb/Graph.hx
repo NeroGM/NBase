@@ -30,6 +30,8 @@ class Node extends Object {
     public var interactive:Interactive;
     /** Whether this node is enabled. **/
     public var enabled:Bool = true;
+    /** The associated `nb.Graph` instance. **/
+    public var graph:Graph = null;
     
     /**
      * Creates an `nb.Graph.Node` instance.
@@ -40,6 +42,7 @@ class Node extends Object {
      **/
     override public function new(x:Float, y:Float, graph:Graph) {
         super(graph);
+        this.graph = graph;
         this.id = graph.nextNodeId++;
         setPosition(x,y);
 
@@ -51,12 +54,21 @@ class Node extends Object {
             var pStart = new Point(e1.relX,e1.relY);
             interactive.onDrag = (e2) -> {
                 var diffP = globalToLocal(new Point(e2.relX,e2.relY)).sub(globalToLocal(pStart.clone()));
-                setPosition(p.x+diffP.x,p.y+diffP.y);
+                moveTo(p.x+diffP.x,p.y+diffP.y);
                 graph.debugDraw();
-                graph.onPointMove();
             }
             interactive.onDragEnd = (_) -> { interactive.onDragEnd = interactive.onDrag = (_) -> {}; }
         }
+    }
+
+    override public function moveTo(x:Float, y:Float) {
+        super.moveTo(x,y);
+        graph.onNodeMove(this);
+    }
+
+    override public function move(x:Float, y:Float) {
+        super.move(x,y);
+        graph.onNodeMove(this);
     }
 
     /** Adds an interactive to move the node. **/
@@ -105,8 +117,7 @@ class Graph extends Object {
     /** Used in pathfinding. The maximum loop count. **/
     private var defaultMaxStep:Int = 1000;
     /** The last path that the pathfinder made. **/
-    public var lastPath:Array<Node> = [];
-    private var currISearch:Int = -1; // ! ???
+    public var lastPath(default,null):Array<Node> = [];
 
     /**
      * Whether this instance should track networks.
@@ -189,7 +200,8 @@ class Graph extends Object {
                 toNode.connections.push(node);
 
                 if (trackNetworks) {
-                    if (toNode.netId == 0) node.netId == 0 ? newNetwork(node,toNode) : { toNode.netId = node.netId; networks[0].remove(toNode); }
+                    if (toNode.netId == 0) node.netId == 0 ? newNetwork(node,toNode) : {
+                        toNode.netId = node.netId; networks[0].remove(toNode); networks[node.netId].push(toNode); }
                     else if (node.netId == 0) { node.netId = toNode.netId; networks[0].remove(node); networks[toNode.netId].push(node); }
                     else if (toNode.netId > node.netId) convertNetwork(node.netId, toNode.netId);
                     else if (toNode.netId < node.netId) convertNetwork(toNode.netId, node.netId);
@@ -212,7 +224,7 @@ class Graph extends Object {
                 n.connections.remove(node);
 
                 if (trackNetworks) {
-                    var path = path(node,n);
+                    var path = path(node,n,null,true,false);
                     if (path == null || path[path.length-1] != n) {
                         var oneSingled:Bool = false;
                         if (node.connections.length == 0) {
@@ -349,30 +361,43 @@ class Graph extends Object {
      * @param start The node to start the path from.
      * @param end The node to end the path to.
      * @param maxStep The maximum number of steps/loop count.
+     * @param skipEvents Whether pathfinder events should be called.
+     * @param setLastPath Whether `lastPath` will be set to the resulting path.
      * @return An array of `nb.Graph.Node` instances representing a path.
      **/
-    public function path(start:Node, end:Node, ?maxStep:Null<Int>):Null<Array<Node>> {
+    public function path(start:Node, end:Node, ?maxStep:Null<Int>, skipEvents:Bool=false, updateVars:Bool=true):Null<Array<Node>> {
         if (maxStep == null) maxStep = this.defaultMaxStep;
         if (start == end) return [start];
 
-        this.start = start;
-        this.end = end;
-        currentNode = start;
-        calculatedNodes = [start];
-        checkedNodes = [start];
-        newCalcNodes = [];
+        var currentNode = start;
+        var calculatedNodes = [start];
+        var checkedNodes = [start];
+        var newCalcNodes = [];
         start.cost = 0;
 
-        onPathStart();
+        function doSetVars() {
+            this.start = start;
+            this.end = end;
+            this.currentNode = currentNode;
+            this.calculatedNodes = calculatedNodes;
+            this.checkedNodes = checkedNodes;
+            this.newCalcNodes = newCalcNodes;
+            this.lastPath = lastPath;
+        }
+
+        if (!skipEvents) {
+            onPathStart();
+            onCurrentNode(currentNode);
+        }
 
         var c:Int = 1;
         while (1 == 1) {
-            for (node in calculatedNodes) onWasCalculated(node);
+            if (!skipEvents) for (node in calculatedNodes) if (!newCalcNodes.contains(node)) onWasCalculated(node);
 
             newCalcNodes = [];
-            for (node in calcSurroundings(currentNode)) {
+            for (node in calcSurroundings(currentNode,calculatedNodes,end)) {
                 newCalcNodes.push(node);
-                onJustCalculated(node);
+                if (!skipEvents) onJustCalculated(node);
                 calculatedNodes.push(node);
                 calculatedNodes.sort((a,b)->{
                     if (getDistance(a,end)+a.cost < getDistance(b,end)+b.cost) return -1;
@@ -384,7 +409,7 @@ class Graph extends Object {
             for (i in 0...calculatedNodes.length) if (checkedNodes.indexOf(calculatedNodes[i]) == -1) {
                 currentNode = calculatedNodes[i];
                 checkedNodes.push(calculatedNodes[i]);
-                onCurrentNode(currentNode);
+                if (!skipEvents) onCurrentNode(currentNode);
                 break;
             }
 
@@ -393,10 +418,19 @@ class Graph extends Object {
             if (currentNode == end || c++ >= maxStep) {
                 var path:Array<Node> = [currentNode];
                 while (path[0] != start) path.insert(0,path[0].cameFrom);
-                return lastPath = path;
+                if (updateVars) doSetVars();
+                return path;
             }
         }
         return null;
+    }
+
+    public function getLastPathInfo() {
+        return {
+            start:this.start, end:this.end, currentNode:this.currentNode,
+            calculatedNodes:this.calculatedNodes, checkedNodes:this.checkedNodes,
+            newCalcNodes:this.newCalcNodes, lastPath:this.lastPath
+        }
     }
 
     /**
@@ -435,34 +469,53 @@ class Graph extends Object {
         // Segment: Anything else
         params[4].lineColor = 0x727272;
 
-        var checkedNodes:Array<Node> = [];
+        var checkedNodes:Array<Node> = [allNodes[0]];
         var onNodes:Array<Node> = [allNodes[0]];
         var nextNodes:Array<Node> = [];
-        currISearch = currISearch > 2000000 ? 0 : currISearch+1;
+        var uncheckedNodes:Array<Node> = trackNetworks ? [] : allNodes.copy(); // Unused if trackNetworks
+        var checkedNetworksIds:Array<Int> = []; // Unused if !trackNetworks
         while (onNodes.length > 0) {
             for (onNode in onNodes) {
+                if (!trackNetworks) uncheckedNodes.remove(onNode);
+
                 if (onNode.connections.length > 0) {
                     var node1OnPath = lastPath.contains(onNode);
                     debugG.drawCircle(onNode.x, onNode.y, pointRadius, 0, node1OnPath ? params[0] : params[1]);
 
                     for (conn in onNode.connections) {
                         debugG.drawLine(onNode.x,onNode.y,conn.x,conn.y, (lastPath.contains(conn) && node1OnPath) ? params[3] : params[4]);
-                        if (!checkedNodes.contains(conn)) nextNodes.push(conn);
+                        if (!checkedNodes.contains(conn)) {
+                            nextNodes.push(conn);
+                            checkedNodes.push(conn);
+                        }
                     }
                 } else debugG.drawCircle(onNode.x, onNode.y, pointRadius, 0, params[2]);
 
                 onNode.addInteractive();
-                checkedNodes.push(onNode);
             }
 
             onNodes = nextNodes;
             nextNodes = [];
+
+            if (onNodes.length == 0 && checkedNodes.length != allNodes.length) {
+                if (trackNetworks) {
+                    checkedNetworksIds.push(checkedNodes[checkedNodes.length-1].netId);
+                    for (net in networks) if (net[0] != null) if (!checkedNetworksIds.contains(net[0].netId)) {
+                        onNodes = [net[0]];
+                        break;
+                    }
+                    if (onNodes.length == 0) throw "Couldn't find supposed unchecked network."; // Should never happen
+                } else {
+                    onNodes = [uncheckedNodes[0]];
+                }
+            }
         }
 
         addChild(debugG);
     }
 
-    private function calcSurroundings(node:Node):Array<Node> {
+    /** Assigns the nodes connected to `node` their "pathfinder values". **/
+    private function calcSurroundings(node:Node, calculatedNodes:Array<Node>, end:Node):Array<Node> {
         var a:Array<Node> = [];
         for (con in node.connections) {
             if (calculatedNodes.indexOf(con) != -1 || !con.enabled) continue;
@@ -474,21 +527,35 @@ class Graph extends Object {
         return a;
     }
 
+    /** Returns a distance between two nodes. **/
     public dynamic function getDistance(n1:Node, n2:Node):Float return Math.abs(n2.x - n1.x) + Math.abs(n2.y - n1.y);
 
+    /**
+     * A saved connection logic.
+     *
+     * @param allNodes All nodes in this instance.
+     * @param newNode The node that was just added to this instance.
+     **/
     public dynamic function autoConnect(allNodes:Array<Node>, newNode:Node) { }
 
+    /** Called whenever two nodes connects. **/
     public dynamic function onConnect(node1:Node, node2:Node) { }
 
+    /** Called whenever two nodes disconnects. **/
     public dynamic function onDisconnect(node1:Node, node2:Node) { }
 
+    /** Called in pathfinding, at the start of the loop, when a node had its pathfinder values assigned in the previous loop. **/
     public dynamic function onWasCalculated(node:Node) { }
 
+    /** Called in pathfinding, when a node's pathfinder values was just assigned. **/
     public dynamic function onJustCalculated(node:Node) { }
 
+    /** Called in pathfinding, when the pathfinder goes on a node. **/
     public dynamic function onCurrentNode(node:Node) { }
 
+    /** Called when pathfinding start. **/
     public dynamic function onPathStart() { }
 
-    public dynamic function onPointMove() { }
+    /** Called whenever a node moves. **/
+    public dynamic function onNodeMove(node:Node) { }
 }
