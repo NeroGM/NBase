@@ -30,6 +30,8 @@ class Node extends Object {
     public var interactive:Interactive;
     /** Whether this node is enabled. **/
     public var enabled:Bool = true;
+    /** The associated `nb.Graph` instance. **/
+    public var graph:Graph = null;
     
     /**
      * Creates an `nb.Graph.Node` instance.
@@ -40,6 +42,7 @@ class Node extends Object {
      **/
     override public function new(x:Float, y:Float, graph:Graph) {
         super(graph);
+        this.graph = graph;
         this.id = graph.nextNodeId++;
         setPosition(x,y);
 
@@ -51,12 +54,21 @@ class Node extends Object {
             var pStart = new Point(e1.relX,e1.relY);
             interactive.onDrag = (e2) -> {
                 var diffP = globalToLocal(new Point(e2.relX,e2.relY)).sub(globalToLocal(pStart.clone()));
-                setPosition(p.x+diffP.x,p.y+diffP.y);
+                moveTo(p.x+diffP.x,p.y+diffP.y);
                 graph.debugDraw();
-                graph.onPointMove();
             }
             interactive.onDragEnd = (_) -> { interactive.onDragEnd = interactive.onDrag = (_) -> {}; }
         }
+    }
+
+    override public function moveTo(x:Float, y:Float) {
+        super.moveTo(x,y);
+        graph.onNodeMove(this);
+    }
+
+    override public function move(x:Float, y:Float) {
+        super.move(x,y);
+        graph.onNodeMove(this);
     }
 
     /** Adds an interactive to move the node. **/
@@ -506,5 +518,5 @@ class Graph extends Object {
 
     public dynamic function onPathStart() { }
 
-    public dynamic function onPointMove() { }
+    public dynamic function onNodeMove(node:Node) { }
 }
