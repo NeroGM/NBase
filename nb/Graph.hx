@@ -447,14 +447,13 @@ class Graph extends Object {
         // Segment: Anything else
         params[4].lineColor = 0x727272;
 
-        var checkedNodes:Array<Node> = [];
+        var checkedNodes:Array<Node> = [allNodes[0]];
         var onNodes:Array<Node> = [allNodes[0]];
         var nextNodes:Array<Node> = [];
         var uncheckedNodes:Array<Node> = trackNetworks ? [] : allNodes.copy(); // Unused if trackNetworks
         var checkedNetworksIds:Array<Int> = []; // Unused if !trackNetworks
         while (onNodes.length > 0) {
             for (onNode in onNodes) {
-                checkedNodes.push(onNode);
                 if (!trackNetworks) uncheckedNodes.remove(onNode);
 
                 if (onNode.connections.length > 0) {
@@ -463,7 +462,10 @@ class Graph extends Object {
 
                     for (conn in onNode.connections) {
                         debugG.drawLine(onNode.x,onNode.y,conn.x,conn.y, (lastPath.contains(conn) && node1OnPath) ? params[3] : params[4]);
-                        if (!checkedNodes.contains(conn)) nextNodes.push(conn);
+                        if (!checkedNodes.contains(conn)) {
+                            nextNodes.push(conn);
+                            checkedNodes.push(conn);
+                        }
                     }
                 } else debugG.drawCircle(onNode.x, onNode.y, pointRadius, 0, params[2]);
 
@@ -476,7 +478,7 @@ class Graph extends Object {
             if (onNodes.length == 0 && checkedNodes.length != allNodes.length) {
                 if (trackNetworks) {
                     checkedNetworksIds.push(checkedNodes[checkedNodes.length-1].netId);
-                    for (net in networks) if (!checkedNetworksIds.contains(net[0].netId)) {
+                    for (net in networks) if (net[0] != null) if (!checkedNetworksIds.contains(net[0].netId)) {
                         onNodes = [net[0]];
                         break;
                     }
