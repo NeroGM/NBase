@@ -52,7 +52,7 @@ class Node extends Object {
             interactive.onDrag = (e2) -> {
                 var diffP = globalToLocal(new Point(e2.relX,e2.relY)).sub(globalToLocal(pStart.clone()));
                 setPosition(p.x+diffP.x,p.y+diffP.y);
-                // graph.debugDraw();
+                graph.debugDraw();
                 graph.onPointMove();
             }
             interactive.onDragEnd = (_) -> { interactive.onDragEnd = interactive.onDrag = (_) -> {}; }
@@ -400,146 +400,68 @@ class Graph extends Object {
         return null;
     }
 
-    // static var c:Int = 0;
-    // public function addSegmentInteractive(n1:Node, n2:Node) {
-    //     var t = haxe.Timer.stamp();
-    //     var interactive:Interactive = null;
-    //     if (c >= debugInteractives.length){
-    //         interactive = new Interactive(0,0,this);
-    //         debugInteractives.push(interactive);
-    //         trace("N");
-    //     } else {
-    //         interactive = debugInteractives[c];
-    //     }
-    //     c++;
-
-    //     interactive.onMove = (e) -> {
-    //         var seg = new Segment(n1.p,n2.p);
-    //         var p = globalToLocal(new Point(e.relX, e.relY));
-    //         var p2 = seg.project(p);
-    //         // trace(localToGlobal(p2));
-    //     }
-    //     interactive.onClick = (e) -> {
-    //         if (e.button == nb.Key.MOUSE_RIGHT) {
-    //             var seg = new Segment(n1.p,n2.p);
-    //             var p = globalToLocal(new Point(e.relX, e.relY));
-    //             var p2 = seg.project(p);
-
-    //             var newNode = addNode(new Point(p2.x,p2.y),false);
-    //             disconnect(n1,[n2]);
-    //             connect(n1,[newNode]);
-    //             connect(newNode,[n2]);
-    //             debugDraw(true);
-    //             onPointMove();
-    //         }
-    //     }
-
-    //     var dist = new Point(n2.x-n1.x, n2.y-n1.y);
-    //     interactive.setPosition(n1.x,n1.y);
-    //     var thickness:Int = 1;
-    //     var angle = nb.utils.Math.angleBetweenPoints(n1.p, n2.p);
-    //     var cos1 = Math.cos(angle+Math.PI*0.5); var sin1 = Math.sin(angle+Math.PI*0.5);
-    //     var thickP = new Point(thickness*cos1,thickness*sin1);
-    //     var offsetP = new Point(4*Math.cos(angle), 4*Math.sin(angle));
-    //     // cos1 = sin1 = 1;
-    //     var a = [
-    //         new Point(offsetP.x-thickP.x,offsetP.y-thickP.y),
-    //         new Point(-offsetP.x+dist.x-thickP.x,-offsetP.y+dist.y-thickP.y),
-    //         new Point(-offsetP.x+dist.x+thickP.x,-offsetP.y+dist.y+thickP.y),
-    //         new Point(offsetP.x+thickP.x,offsetP.y+thickP.y)
-    //     ];
-    //     interactive.loadShape(new nb.shape.Polygon(a));
-    //     interactive.shapes.debugDraw();
-    //     // trace(n1.p + "   " + n2.p + "    " + a);
-    //     // trace(haxe.Timer.stamp()-t + "   "  + Manager.nbObjects.length);
-    // }
-
-    // /*
-    // * POINT
-    // * Green : Connected, in path
-    // * Grey : Connected, not in path
-    // * Red : No connection
-    // * 
-    // * SEGMENT
-    // * Lighter green : In path
-    // * Grey : Anything else
-    // */
-    // public function debugDraw2(withInteractive:Bool=false) {
-    //     debugG2.clear();
+    /**
+     * Draws a visualization of this instance.
+     *
+     * POINT:
+     * `Green: Connected, in path
+     * | Grey: Connected, not in path
+     * | Red: No connection`
+     * 
+     * SEGMENT:
+     * `Darker green: In path
+     * | Grey: Anything else`
+     *
+     * @param pointRadius The radius of the circle drawn for each node.
+     * @param withInteractive Whether the nodes will have their interactives enabled, making them movable.
+     **/
+    public function debugDraw(pointRadius:Float=2, withInteractive:Bool=false) {
+        debugG.clear();
         
-    //     var params:Array<nb.Graphics2.DrawingParams2> = [for (i in 0...4) nb.Graphics2.getDefaultParams()];
-    //     params[0].lineColor = 0xFFFFFF;
-    //     params[0].fillColor = 0x00FF00;
-    //     params[0].filled = true;
-    //     params[1].lineColor = 0xFFFFFF;
-    //     params[1].fillColor = 0x888888;
-    //     params[1].filled = true;
-    //     params[2].lineColor = 0x333333;
-    //     params[2].fillColor = 0xFF0000;
-    //     params[2].filled = true;
-    //     params[3].lineColor = 0x006600;
+        var params:Array<nb.Graphics.DrawingParams> = [for (i in 0...5) nb.Graphics.getDefaultParams()];
+        // Point: Connected, in path
+        params[0].lineColor = 0xFFFFFF;
+        params[0].fillColor = 0x00FF00;
+        params[0].filled = true;
+        // Point: Connected, not in path
+        params[1].lineColor = 0xFFFFFF;
+        params[1].fillColor = 0x888888;
+        params[1].filled = true;
+        // Point: No connection
+        params[2].lineColor = 0x333333;
+        params[2].fillColor = 0xFF0000;
+        params[2].filled = true;
+        // Segment: In path
+        params[3].lineColor = 0x006600;
+        // Segment: Anything else
+        params[4].lineColor = 0x727272;
 
-    //     var checkedNodes:Array<Node> = [];
-    //     var onNodes:Array<Node> = [allNodes[0]];
-    //     var nextNodes:Array<Node> = [];
-    //     currISearch = currISearch > 2000000 ? 0 : currISearch+1;
-    //     while (onNodes.length > 0) {
-    //         for (onNode in onNodes) {
-    //             if (onNode.connections.length > 0) {
-    //                 debugG2.drawCircle(onNode.x, onNode.y, 2, 0, lastPath.contains(onNode) ? params[0] : params[1]);
+        var checkedNodes:Array<Node> = [];
+        var onNodes:Array<Node> = [allNodes[0]];
+        var nextNodes:Array<Node> = [];
+        currISearch = currISearch > 2000000 ? 0 : currISearch+1;
+        while (onNodes.length > 0) {
+            for (onNode in onNodes) {
+                if (onNode.connections.length > 0) {
+                    var node1OnPath = lastPath.contains(onNode);
+                    debugG.drawCircle(onNode.x, onNode.y, pointRadius, 0, node1OnPath ? params[0] : params[1]);
 
-    //                 for (conn in onNode.connections) {
-    //                     if (!checkedNodes.contains(conn)) nextNodes.push(conn);
-    //                 }
-    //             } else debugG2.drawCircle(onNode.x, onNode.y, 2, 0, params[2]);
+                    for (conn in onNode.connections) {
+                        debugG.drawLine(onNode.x,onNode.y,conn.x,conn.y, (lastPath.contains(conn) && node1OnPath) ? params[3] : params[4]);
+                        if (!checkedNodes.contains(conn)) nextNodes.push(conn);
+                    }
+                } else debugG.drawCircle(onNode.x, onNode.y, pointRadius, 0, params[2]);
 
-    //             checkedNodes.push(onNode);
-    //         }
+                onNode.addInteractive();
+                checkedNodes.push(onNode);
+            }
 
-    //         onNodes = nextNodes;
-    //         nextNodes = [];
-    //     }
+            onNodes = nextNodes;
+            nextNodes = [];
+        }
 
-    //     addChild(debugG2);
-    // }
-
-    // public function debugDraw(withInteractive:Bool=true):Graphics {
-    //     if (allNodes.length <= 0) return debugG;
-    //     c = 0;
-
-    //     debugG.clear();
-    //     var gParams = Graphics.getDefaultParams(2);
-    //     gParams[0].lineColor = 0x880088;
-    //     gParams[1].lineColor = 0xFF0000;
-
-    //     var checkedNodes:Array<Node> = [];
-    //     var uncheckedNodes:Array<Node> = allNodes.copy(); // maybe stop being lazy and get rid of it ?
-    //     var onNodes:Array<Node> = [allNodes[0]];
-    //     var nextNodes:Array<Node> = [];
-    //     while (onNodes.length > 0) {
-    //         for (onNode in onNodes) {
-    //             checkedNodes.push(onNode);
-    //             uncheckedNodes.remove(onNode);
-
-    //             if (onNode.connections.length != 0) {
-    //                 debugG.drawCircle(onNode.x,onNode.y,2,0,null,gParams[0]);
-    //                 for (connectedNode in onNode.connections) if (!checkedNodes.contains(connectedNode)) {
-    //                     debugG.drawLine(onNode.x,onNode.y,connectedNode.x,connectedNode.y,null,gParams[0]);
-    //                     if (withInteractive) addSegmentInteractive(onNode,connectedNode);
-    //                     nextNodes.push(connectedNode);
-    //                 }
-    //             } else debugG.drawCircle(onNode.x,onNode.y,2,0,null,gParams[1]);
-    //             if (withInteractive) onNode.addInteractive();
-    //         }
-
-    //         if (nextNodes.length > 0) { onNodes = nextNodes; nextNodes = []; }
-    //         else if (uncheckedNodes.length > 0) onNodes = [uncheckedNodes[0]];
-    //         else onNodes = [];
-    //     }
-    //     // addChild(debugG);
-        
-    //     return debugG;
-    // }
+        addChild(debugG);
+    }
 
     private function calcSurroundings(node:Node):Array<Node> {
         var a:Array<Node> = [];
