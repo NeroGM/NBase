@@ -393,8 +393,7 @@ class Graph extends Object {
             if (currentNode == end || c++ >= maxStep) {
                 var path:Array<Node> = [currentNode];
                 while (path[0] != start) path.insert(0,path[0].cameFrom);
-                lastPath = path;
-                return path;
+                return lastPath = path;
             }
         }
         return null;
