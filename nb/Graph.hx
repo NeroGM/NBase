@@ -363,10 +363,11 @@ class Graph extends Object {
         start.cost = 0;
 
         onPathStart();
+        onCurrentNode(currentNode);
 
         var c:Int = 1;
         while (1 == 1) {
-            for (node in calculatedNodes) onWasCalculated(node);
+            for (node in calculatedNodes) if (!newCalcNodes.contains(node)) onWasCalculated(node);
 
             newCalcNodes = [];
             for (node in calcSurroundings(currentNode)) {
