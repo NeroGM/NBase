@@ -2,6 +2,9 @@ package nb.shape;
 
 using nb.ext.PointExt;
 using nb.ext.SegmentExt;
+using nb.ext.MathExt;
+using nb.ext.ArrayExt;
+import nb.Graph;
 
 class Shapes extends Object {
     public var shapes:Array<Shape> = [];
@@ -110,47 +113,111 @@ class Shapes extends Object {
         return res;
     }
 
-    public function makeUnion():Graph {
-        var graph = new Graph();
+    public function makeUnion() {
+        var graph = new Graph(null,false,true);
         var checkedShapes:Array<Shape> = [];
+        var savedNodes:haxe.ds.Map<Polygon,Array<nb.Graph.Node>> = [];
         var savedSegments:haxe.ds.Map<Int,Array<Segment>> = new haxe.ds.Map();
 
         if (shapes.length < 2) return null;
 
+        // Make graph
+        var p1:Point = null;
+        var p2:Point = null;
         for (shape1 in shapes) {
             if (shape1 is Polygon) {
                 var pol1 = cast(shape1,Polygon);
                 if (savedSegments[shape1.objId] == null) savedSegments[shape1.objId] = pol1.toSegments();
                 var segments1:Array<Segment> = savedSegments[shape1.objId];
-                for (i in 0...segments1.length) {
-                    var seg1 = segments1[i];
-                    var p1 = seg1.getA();
-                    var p2 = seg1.getB();
-                    var nodeP1 = i == 0 ? graph.addNode(p1) : graph.getNodeAtPoint(p1);
-                    var nodeP2 = i == segments1.length-1 ? graph.getNodeAtPoint(p2) : graph.addNode(p2);
-                    if (checkedShapes.length == 0) graph.connect(nodeP1,[nodeP2]);
-                    else for (shape2 in checkedShapes) {
-                        if (shape2 is Polygon) {
-                            var pol2 = cast(shape2,Polygon);
-                            if (savedSegments[shape2.objId] == null) savedSegments[shape2.objId] = pol2.toSegments();
-                            var segments2:Array<Segment> = savedSegments[shape2.objId];
+                var i1Offset:Int = 0;
+                for (i1 in 0...1000) {
+                    var v1 = i1 + i1Offset;
+                    if (v1 == segments1.length) break;
 
-                            for (seg2 in segments2) {
-                                var cInfo = seg1.checkSeg(seg2);
-                                if (cInfo != null) {
+                    var seg1 = segments1[v1];
+                    var nodeP1:Graph.Node = null;
+                    var nodeP2:Graph.Node = null;
+                    p1 = seg1.getA();
+                    p2 = seg1.getB();
+                    // trace("tracing1: " + p1 + "   " + p2);
+                    
+                    if (v1 == 0) {
+                        nodeP1 = graph.addNode(p1);
+                        savedNodes[pol1] = [nodeP1];
+                    } else nodeP1 = savedNodes[pol1][v1];
+                    if (v1 != segments1.length-1) {
+                        nodeP2 = graph.addNode(p2);
+                        savedNodes[pol1].push(nodeP2);
+                    } else nodeP2 = savedNodes[pol1].at(v1+1);
+
+                    if (checkedShapes.length == 0) {
+                        graph.connect(nodeP1,[nodeP2]);
+                        // trace("conn1: " + new Point(nodeP1.x,nodeP1.y) + "    " + new Point(nodeP2.x,nodeP2.y));
+                    } else {
+                        var b:Bool = false;
+                        for (shape2 in checkedShapes) {
+                            if (shape2 is Polygon) {
+                                var pol2 = cast(shape2,Polygon);
+                                if (savedSegments[shape2.objId] == null) savedSegments[shape2.objId] = pol2.toSegments();
+                                var segments2:Array<Segment> = savedSegments[shape2.objId];
+
+                                var savedNode:Graph.Node = null;
+                                var i2Offset:Int = 0;
+                                for (i2 in 0...1000) {
+                                    var v1 = i1+i1Offset;
+                                    var v2 = i2+i2Offset;
+                                    if (v2 == segments2.length) break;
+
+                                    var seg1 = segments1[v1];
+                                    var seg2 = segments2[v2];
+                                    var p1 = seg1.getA();
+                                    var p2 = seg1.getB();
                                     var p3 = seg2.getA();
                                     var p4 = seg2.getB();
-                                    var nodeP3 = graph.getNodeAtPoint(p3);
-                                    var nodeP4 = graph.getNodeAtPoint(p4);
-                                    var nodeInters = graph.addNode(cInfo[0]);
-                                    graph.disconnect(nodeP3,[nodeP4]);
-                                    graph.connect(nodeInters,[nodeP1,nodeP2,nodeP3,nodeP4]);
-                                } else {
-                                    graph.connect(nodeP1,[nodeP2]);
+
+                                    var inters:Point = new Point();
+                                    var coll = nb.phys.Collision.checkSegments(p1,p2,p3,p4,inters);
+                                    // trace("check: "+ p1 + "  " + p2 +"   " +p3+ "   " + p4+ "   "+ coll);
+                                    // trace(v1 + "  " + v2);
+                                    if (coll > 0) {
+                                        segments1.remove(segments1[v1]);
+                                        segments1.insert(v1,new Segment(p1,inters));
+                                        segments1.insert(v1+1,new Segment(inters,p2));
+
+                                        segments2.remove(segments2[v2]);
+                                        segments2.insert(v2,new Segment(p3,inters));
+                                        segments2.insert(v2+1,new Segment(inters,p4));
+
+                                        var connTo:Array<nb.Graph.Node> = [savedNode == null ? nodeP1 : savedNode];
+                                        
+                                        var nodeP3 = savedNodes[pol2][v2];
+                                        var nodeP4 = savedNodes[pol2].at(v2+1);
+
+                                        graph.disconnect(nodeP3,[nodeP4]);
+                                        connTo.push(nodeP3);
+                                        connTo.push(nodeP4);
+
+                                        var nodeInters = graph.addNode(inters);
+                                        graph.connect(nodeInters, connTo);
+                                        // trace("conn2: " + new Point(nodeInters.x,nodeInters.y) + "    " + [for (n in connTo) new Point(n.x,n.y)]);
+
+                                        savedNodes[pol1].insert(v1+1,nodeInters);
+                                        savedNodes[pol2].insert(v2+1,nodeInters);
+                                        i1Offset++;
+                                        i2Offset++;
+                                        savedNode = nodeInters;
+                                        b = true;
+                                    }
                                 }
+                                if (savedNode != null) graph.connect(savedNode,[nodeP2]);
                             }
                         }
+                        if (!b) {
+                            graph.connect(nodeP1, [nodeP2]);
+                            // trace("conn3: " + new Point(nodeP1.x,nodeP1.y) + "    " + new Point(nodeP2.x,nodeP2.y));
+                        }
                     }
+                    
                 }
                 checkedShapes.push(shape1);
             }
