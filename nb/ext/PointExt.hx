@@ -88,4 +88,24 @@ class PointExt {
         p.set(p.x + Math.cos(angle) * distance, p.y + Math.sin(angle) * distance);
         return p;
     }
+
+    /**
+     * Returns the farthest point in a given direction.
+     * 
+     * @param points An array of `h2d.col.Point`.
+     * @param direction Defines a direction where (1,0) is right and (0,1) is down.
+     * @return The farthest point in the array. (No copy is done.)
+     **/
+    public static function getFarthestPoints(points:Array<Point>, direction:Point):Array<Point> {
+		var highest:Float = Math.NEGATIVE_INFINITY;
+		var result:Array<Point> = [];
+		for (p in points) {
+			var v = p.dot(direction);
+			if (v > highest) {
+				highest = v;
+				result = [p];
+			} else if (v == highest) result.push(p);
+		}
+		return result;
+	}
 }

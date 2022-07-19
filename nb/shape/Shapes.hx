@@ -1,38 +1,50 @@
 package nb.shape;
 
 using nb.ext.PointExt;
+using nb.ext.SegmentExt;
+using nb.ext.MathExt;
+using nb.ext.ArrayExt;
+import nb.Graph;
 
-class Shapes extends Object {
-    public var a:Array<Shape> = [];
+/**
+ * Represents a shape made from multiple shapes.
+ *
+ * WARNING: It is only meant to work with polygons for now.
+ *
+ * @since 0.1.0
+ **/
+class Shapes extends Shape {
+    /** An array of `nb.shape.Shape` containing the individual shapes of this instance. **/
+    public var shapes:Array<Shape> = [];
+    /** An array of `nb.shape.Shape` containing the shapes resulting from the union of `shapes`. **/
     public var union:Array<Shape> = [];
-    public var centroid:Point = null;
-    public var type:nb.shape.Shape.ShapeType;
-    public var center:Point = new Point();
 
-    // private var debugG:Graphics;
-    // private var gParams:Array<nb.Graphics.DrawingParams>;
+    /**
+     * Creates an `nb.shape.Shapes` instance.
+     * 
+     * @param parent The parent object of the instance.
+     **/
     public function new(?parent:h2d.Object) {
         super(parent);
-        // debugG = new Graphics(0,0,this);
-        // gParams = Graphics.getDefaultParams();
-        // gParams[0].lineColor = 0xFFFFFF;
     }
 
-    // For now, should be used only for set of polygons
+    /** Adds a shape to this instance. (Expects polygons.) **/
     public function addShape(shape:Shape) {
-        a.push(shape);
+        shapes.push(shape);
         addChild(shape);
         makeUnion();
-        updateParams();
+        updateFields();
     }
 
-    public function addShapes(a:Array<Shape>) {
-        for (shape in a) { this.a.push(shape); addChild(shape); }
+    /** Adds multiple shapes to this instance. (Expects polygons.) **/
+    public function addShapes(shapes:Array<Shape>) {
+        for (shape in shapes) { this.shapes.push(shape); addChild(shape); }
         makeUnion();
-        updateParams();
+        updateFields();
     }
 
-    public function updateParams() {
+    /** Updates fields related to this instance's current attributes, as deduced from the shapes it contains. **/
+    public function updateFields() {
         if (union.length == 0) return;
 
         centroid = null;
@@ -40,236 +52,226 @@ class Shapes extends Object {
         var leftP:Point = null;
         var topP:Point = null;
         var botP:Point = null;
-        if (centroid == null) for (pol in union) {
-            var rP = pol.getSupportPoint(new Point(1,0));
-            var lP = pol.getSupportPoint(new Point(-1,0));
-            var tP = pol.getSupportPoint(new Point(0,-1));
-            var bP = pol.getSupportPoint(new Point(0,1));
+        for (shape in union) {
+            var rP = shape.getFarthestPoints(new Point(1,0))[0];
+            var lP = shape.getFarthestPoints(new Point(-1,0))[0];
+            var tP = shape.getFarthestPoints(new Point(0,-1))[0];
+            var bP = shape.getFarthestPoints(new Point(0,1))[0];
             if (rightP == null || rightP.x < rP.x) rightP = rP;
             if (leftP == null || leftP.x > lP.x) leftP = lP;
             if (topP == null || topP.y > tP.y) topP = tP;
             if (botP == null || botP.y < bP.y) botP = bP;
 
-            if (centroid == null) centroid = pol.centroid.clone();
-            else centroid = centroid.add(pol.centroid).multiply(0.5);
+            if (centroid == null) centroid = shape.centroid.clone();
+            else centroid = centroid.add(shape.centroid).multiply(0.5);
         }
         
         setSize(Math.abs(rightP.x-leftP.x),Math.abs(topP.y-botP.y));
         center.set(leftP.x+size.w/2,topP.y+size.h/2);
-    //    setOffset(-centroid.x,-centroid.y); How to deal with it
-    //    centroidToOrigin();
-    //    trace(size);
 
-        type = (a.length == 1) ? a[0].type : COMPLEX;
+        defs = shapes.length == 1 ? shapes[0].defs.copy() : [COMPLEX];
     }
 
+    /** Returns `true` if the shape contains the point `p`. **/
     public function containsPoint(p:Point):Bool {
-        for (shape in a) if (shape.containsPoint(p)) return true;
+        for (shape in shapes) if (shape.containsPoint(p)) return true;
         return false;
     }
 
+    /** Moves all shapes so that centroid is at (0,0). */
     public function centroidToOrigin() {
-        for (s in a) {
-            if (s.type == POLYGON) {
+        for (s in shapes) {
+            if (s is Polygon) {
                 var pol = cast(s,Polygon);
                 for (i in 0...pol.points.length) {
                     pol.points[i].sub(centroid);
-                } 
-            } else if (s.type == CIRCLE) {
+                }
+            } else if (s is Circle) {
                 var circ = cast(s,Circle);
                 circ.x -= centroid.x;
                 circ.y -= centroid.y;
-            }
+            } else throw "Unknown shape '" + s.toString() + "'"; 
         }
         centroid.set(0,0);
     }
 
+    /** Removes all shapes from this instance. **/
     public function clear() {
-        for (s in a) s.remove();
+        for (s in shapes) s.remove();
         for (s in union) s.remove();
-        a = []; union = [];
+        shapes = []; union = [];
     }
 
-    public function getFarthestPoints():Array<Point> {
-        var highestDist:Float = 0;
+    /** Returns the farthest points in the direction defined by `vector`. **/
+    public function getFarthestPoints(vector:Point):Array<Point> {
         var res:Array<Point> = [];
+        var highest:Null<Float> = null;
         for (s in union) {
-            if (s.type == POLYGON) {
+            if (s is Polygon) {
                 for (p in cast(s,Polygon).points) {
-                    var dist = p.distance(center);
-                    if (dist == highestDist) res.push(p.sub(center));
-                    else if (dist > highestDist) { highestDist = dist; res = [p.sub(center)]; }
-                } 
-            } else if (s.type == CIRCLE) {
-                var p = cast(s,Circle).getSupportPoint(new Point(1,0));
-                var dist = p.distance(center);
-                if (dist == highestDist) res.push(p.sub(center));
-                else if (dist > highestDist) { highestDist = dist; res = [p.sub(center)]; }
+                    var p = p.clone();
+                    // if (entity != null && entity.parent != null) p.rotate(entity.parent.rotation); // use toGlobatPos ?
+                    var v = p.dot(vector);
+                    if (highest == null || v > highest) {
+                        highest = v;
+                        res = [p];
+                    } else if (v == highest) res.push(p);
+                }
+            } else if (s is Circle) {
+                var circ:Circle = cast(s,Circle);
+                if (circ.radius > highest) {
+                    highest = circ.radius;
+                    res = [circ.getFarthestPoints(vector)[0]];
+                } else if (circ.radius == highest) res.push(circ.getFarthestPoints(vector)[0]);
             }
         }
         return res;
     }
 
-    public static function withTransform(a:Array<Shape>, offset:Point):Array<Shape> {
-        var res:Array<Shape> = [];
-        for (s in a) res.push(s.withTransform(offset));
+    /**
+     * Draws the debug visualizations of this instance by calling the `debugDraw`
+     * functions of each shape in `union`.
+     **/
+    public function debugDraw(?color:Int) {
+        for (shape in union) shape.debugDraw(color);
+    }
+
+    /**
+     * Removes the debug visualizations of this instanceby calling the `debugDraw`
+     * functions of each shape in `union`.
+     **/
+    public function clearDebugDraw() {
+        for (shape in union) shape.clearDebugDraw();
+    }
+
+    /**
+     * Returns the farthest points of this shape from its center or centroid.
+     *
+     * @param fromCentroid If `true`, the points must be the farthest from the centroid.
+     * Otherwise they are the farthest from the center.
+     * @return An array of `h2d.col.Point`. Only the points that are the farthest are returned,
+     * not all the points of this shape from the farthest to the closest.
+     **/
+    public function getFarthestPointsFrom(fromCentroid:Bool=true):Array<Point> {
+        var highestDist:Float = 0;
+        var res:Array<Point> = [];
+        var fromP:Point = fromCentroid ? centroid : center;
+        for (s in union) {
+            if (s is Polygon) {
+                for (p in cast(s,Polygon).points) {
+                    var dist = p.distance(fromP);
+                    if (dist == highestDist) res.push(p.sub(fromP));
+                    else if (dist > highestDist) { highestDist = dist; res = [p.sub(fromP)]; }
+                } 
+            } else if (s is Circle) {
+                var p = cast(s,Circle).getFarthestPoints(new Point(1,0))[0];
+                var dist = p.distance(fromP);
+                if (dist == highestDist) res.push(p.sub(fromP));
+                else if (dist > highestDist) { highestDist = dist; res = [p.sub(fromP)]; }
+            }
+        }
         return res;
     }
 
-    private function makeUnion() {
-    //     var shapes = a;
-    //     var graph = new Graph();
-    //     var startingP:Point = null;
-    // //    graph.onConnect = (node1, node2) -> trace("connect : " + node1.p + "  ->  " + node2.p);
-    // //    trace(" ---------------- " + a);
-    //     if (shapes.length > 1) {
-    //         for (shape1 in shapes) {
-    //             if (shape1.type == POLYGON || shape1.type == CIRCLE) {
-    //                 var pol1:Polygon = null;
-    //                 if (shape1.type == POLYGON) pol1 = cast(shape1,Polygon);
-    //                 else {
-    //                     var c = cast(shape1,Circle);
-    //                     pol1 = Polygon.makeCircle(c.col.x,c.col.y,c.radius,0);
-    //                 }
-    //                 var segments1 = pol1.toSegments();
-    //                 var startingNode:nb.Graph.Node = null;
-    //                 var onNode:nb.Graph.Node = null;
-    //                 for (seg1 in segments1) {
-    //                     var p1 = new Point(seg1.x,seg1.y);
-    //                     var p2 = new Point(seg1.x+seg1.dx,seg1.y+seg1.dy);
-    //                     var sIntersections:Array<Point> = [];
-    //                     for (shape2 in shapes) if (shape2 != shape1) {
-    //                         if (shape2.type == POLYGON) {
-    //                             var pol2 = cast(shape2,Polygon);
-    //                             var segments2 = pol2.points.toSegments();
-    //                             for (seg2 in segments2) {
-    //                                 var p3 = new Point(seg2.x,seg2.y);
-    //                                 var p4 = new Point(seg2.x+seg2.dx,seg2.y+seg2.dy);
-    //                                 var intersection:Point = new Point();
-    //                                 var v = nb.phys.Collision.checkSegments(p1,p2,p3,p4,intersection);
-    //                                 //trace("(" + p1+","+p2+")     ("+p3+","+p4+")");
-    //                             //    trace(v);
-    //                                 if (v > 0) {
-    //                                     sIntersections.push(intersection);
-    //                                     //trace("inters:    (" + p1+","+p2+")     ("+p3+","+p4+")    " + intersection);
-    //                                 }
-    //                             }
-    //                         } else if (shape2.type == CIRCLE) {
-    //                             var cir2 = cast(shape2,Circle);
-    //                             var v = nb.phys.Collision.checkCircleSegment(seg1,cir2.col);
-    //                             // trace(v);
-    //                             if (v != null) for (inters in v) sIntersections.push(inters);
-    //                         } else throw "nah";
-    //                     }
+    /** Returns the resulting shapes from the union of `shapes`. **/
+    public function makeUnion():Array<Polygon> {
+        var graph:Graph = new Graph(null,false,true);
+        var segments:haxe.ds.Map<Polygon, Array<Segment>> = new haxe.ds.Map();
+        var checkedSegs:Array<Array<Segment>> = [];
+        
+        if (shapes.length < 2) return null;
 
-    //                     if (seg1 == segments1[0]) {
-    //                         var node = graph.getNodeAtPoint(new Point(p1.x,p1.y));
-    //                         startingNode = onNode = node == null ? graph.addNode(new Point(p1.x,p1.y)) : node;
-    //                     }
-                        
-    //                     nb.ext.ArrayExt.quickSort(sIntersections,(a,b) -> {
-    //                         return a.sub(p1).length() < b.sub(p1).length();
-    //                     });
+        // Make graph
+        for (shape in shapes) if (shape is Polygon) {
+            var pol = cast(shape,Polygon);
+            segments[pol] = pol.toSegments();
+        }
+        for (segs1 in segments.iterator()) {
+            for (seg1 in segs1) {
+                var startP = seg1.getA();
+                var endP = seg1.getB();
 
-    //                     for (inters in sIntersections) {
-    //                         var node2 = graph.getNodeAtPoint(inters);
-    //                         // trace(inters + "   " + (node2 == null ? "null" : Std.string(node2.p)));
-    //                         if (node2 == null) node2 = graph.addNode(inters.clone());
-    //                         graph.connect(node2, [onNode]);
-    //                         onNode = node2;
-    //                     }
+                var seg1Inters:Array<Point> = [];
+                var recycNodes:haxe.ds.Map<Int,Node> = [];
+                for (segs2 in segments.iterator()) if (segs1 != segs2) {
+                    for (seg2 in segs2) {
+                        var res = seg1.checkSeg(seg2);
+                        if (res != null) {
+                            var intersP = cast(res[0], Point);
+                            if (intersP.equals(startP) || intersP.equals(endP)) continue;
+                            seg1Inters.push(intersP);
+                            if (checkedSegs.contains(segs2)) {
+                                var node = graph.getNodeAtPoint(intersP);
+                                if (node != null) recycNodes[seg1Inters.length-1] = node;
+                            }
+                        }
+                    }
+                }
+                seg1Inters.quickSort((a,b) -> startP.distance(a) < startP.distance(b));
 
-    //                     var p = new Point(seg1.x+seg1.dx,seg1.y+seg1.dy);
-    //                     var toNode:nb.Graph.Node = graph.getNodeAtPoint(p);
-    //                     if (toNode == null) toNode = graph.addNode(p);
-    //                     graph.connect(toNode, [onNode]);
-    //                     onNode = toNode;
+                var startNode = graph.getNodeAtPoint(startP);
+                if (startNode == null) startNode = graph.addNode(startP);
 
-    //                     var farthestP = pol1.getSupportPoint(new Point(1,1));
-    //                     if (startingP == null || startingP.length() < farthestP.length()) startingP = farthestP;
-    //                     //  trace("e      " + pol1.type +"     " + pol1.subType);
-    //                 }
-    //             } else throw "??";
-    //         }
-    //         // trace(startingP);
+                var prevNode:Graph.Node = startNode;
+                for (i in 0...seg1Inters.length) {
+                    var p = seg1Inters[i];
+                    var node:Graph.Node = null;
+                    for (n in recycNodes) if (new Point(n.x,n.y).equals(p)) { node = n; break; }
+                    if (node == null) node = graph.addNode(p);
+                    graph.connect(prevNode,[node]);
+                    prevNode = node;
+                }
 
-    //         // Connect nodes
-    //         var unvisitedNodes:Array<nb.Graph.Node> = graph.allNodes.copy();
-    //         var visitedNodes:Array<nb.Graph.Node> = [];
-    //         var lastNode:nb.Graph.Node = null;
-    //         var onNode:nb.Graph.Node = null;  for (n in graph.allNodes) if (n.p.equalEps(startingP)) { onNode = n; break; }
-    //         var startingNode:nb.Graph.Node = onNode;
-    //         var res:Array<Array<Point>> = [[onNode.p]];
-    //         var shapeC:Int = 0;
-    //         var vec = new Point(1,1);
-    //         var maxC:Int = 500;
-    //         while (1 == 1) {
-    //             unvisitedNodes.remove(onNode);
-    //             visitedNodes.push(onNode);
-    //             //trace(onNode.p);
-    //             var connectedNodes:Array<nb.Graph.Node> = [for (n in onNode.connections) n];
-    //             nb.ext.ArrayExt.quickSort(connectedNodes, (n1,n2) -> {
-    //                 // Todo: add to utils
-    //                 var vec = vec.normalized(); 
-    //                 var p1 = n1.p.sub(onNode.p).normalized(); var dp1 = vec.dot(p1);
-    //                 var p2 = n2.p.sub(onNode.p).normalized(); var dp2 = vec.dot(p2);
-    //                 var v1 = vec.cross(p1) >= 0 ? dp1 : (dp1*-1)-2;
-    //                 var v2 = vec.cross(p2) >= 0 ? dp2 : (dp2*-1)-2;
-    //                 return v1 > v2;
-    //             });
-    //             var a:Array<Point> = [];
-    //             for (node in connectedNodes) a.push(node.p.sub(onNode.p));
-    //             var s = "v:" + vec.normalized() + "  a:";
-    //             for (node in connectedNodes) s += "cross "+vec.normalized().cross(node.p.sub(onNode.p).normalized())+ "    dot " + vec.normalized().dot(node.p.sub(onNode.p).normalized()) + "    ";
-    //             //trace(a);
-    //             //trace(s);
+                var endNode = graph.getNodeAtPoint(endP);
+                if (endNode == null) endNode = graph.addNode(endP);
+                graph.connect(prevNode,[endNode]);
+            }
+            checkedSegs.push(segs1);
+        }
 
-    //             var toNode = null;
-    //             for (node in connectedNodes) if (lastNode != node) { toNode = node; break; }
+        // Get graph perimeter then return it
+        var networks:Array<Array<Node>> = [];
+        for (i in 1...graph.networks.length) {
+            var net = graph.networks[i];
+            if (net[0] != null) networks.push(net);
+        } 
 
-    //             if (toNode != null) {
-    //                 vec = toNode.p.sub(onNode.p).multiply(-1);
-    //                 lastNode = onNode;
-    //                 onNode = toNode;
-    //                 res[shapeC].push(toNode.p);
-    //             }
-                
-    //             if (toNode == startingNode && res[shapeC].length > 2) {
-    //                 res[shapeC].pop();
+        var points:Array<Point> = [for (node in networks[0]) new Point(node.x,node.y)];
+        var fp = points.getFarthestPoints(new Point(1,1))[0];
+        var onNode = graph.getNodeAtPoint(fp);
+        var startNode = onNode;
+        var dir = new Point(1,1);
+        var res:Array<Array<Point>> = [[fp]];
+        var c:Int = 0;
+        while (onNode != null) {
+            var pp = new Point(onNode.x,onNode.y);
+            var a = [for (n in onNode.connections) new Point(n.x,n.y)];
+            a.clockwiseSort(pp, dir);
+            for (i in 0...a.length) {
+                var dir2 = a[0].sub(pp).normalized();
+                if (dir.equals(dir2) || pp.equals(a[0])) a.shift();
+                else break;
+            }
+            res[c].push(a[0]);
+            dir = res[c][res[c].length-2].sub(a[0]).normalized();
 
-    //                 if (unvisitedNodes.length > 0) {
-    //                     nb.ext.ArrayExt.quickSort(unvisitedNodes, (n1,n2) -> {
-    //                         return n1.p.length() > n2.p.length();
-    //                     });
+            for (n in onNode.connections) if (n.x == a[0].x && n.y == a[0].y) { onNode = n; break; }
+            if (onNode.x == startNode.x && onNode.y == startNode.y) {
+                res[c].pop();
+                if (networks.length-1 == c) break;
 
-    //                     var lastPol = new Polygon(res[shapeC]);
-    //                     var toRemove:Array<nb.Graph.Node> = [];
-    //                     for (node in unvisitedNodes) if (lastPol.containsPoint(node.p)) toRemove.push(node);
-    //                     for (node in toRemove) unvisitedNodes.remove(node);
+                c++;
+                var points = [for (node in networks[c]) new Point(node.x,node.y)];
+                var fp = points.getFarthestPoints(new Point(1,1))[0];
+                onNode = graph.getNodeAtPoint(fp);
+                startNode = onNode;
+                dir = new Point(1,1);
+                res[c] = [fp];
+            }
+        }
 
-    //                     if (unvisitedNodes.length < 3) break;
-    //                     lastNode = null;
-    //                     startingNode = onNode = unvisitedNodes[0];
-    //                     vec = onNode.p.clone();
-    //                     shapeC++;
-    //                     res.push([onNode.p]);
-    //                 } else break;
-    //             }
-
-    //             if (--maxC <= 0) throw "union : max loop count reached";
-    //         }
-
-    //         // trace(res);
-    //         union = [for (a in res) if (a.length>=3) {
-    //             var pol = new h2d.col.Polygon(a.concat([a[0]])).optimize(0.15);
-    //             pol.points.pop();
-    //             new Polygon(pol.points,this);
-    //         }];
-    //         // trace(union);
-    //     } else {
-    //         union = shapes.copy();
-    //     }
-
-    // //    addChild(graph.debugDraw());
+        var pols:Array<Polygon> = [for (a in res) new Polygon(a)];
+        union = [for (p in pols) { addChild(p); cast(p,Shape); }];
+        return pols.copy();
     }
 }

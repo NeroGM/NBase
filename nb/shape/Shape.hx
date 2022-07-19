@@ -1,36 +1,46 @@
 package nb.shape;
 
-enum ShapeType {
-    POLYGON;
+import nb.Graphics;
+
+/** Values used to categorize a shape. **/
+enum ShapeDef {
     CIRCLE;
+    POLYGON;
+    RECTANGLE;
     COMPLEX;
 }
 
-enum ShapeSubType {
-    RECTANGLE;
-    NONE;
-}
-
+/**
+ * Represents a shape.
+ *
+ * @since 0.1.0
+ **/
 abstract class Shape extends Object {
-    public var type(default, null):ShapeType;
-    public var subType(default, null):ShapeSubType = NONE;
+    /** The definers of the shape. **/
+    public var defs(default, null):Array<ShapeDef> = [];
+    /** The centroid of the shape. **/
     public var centroid:Point = new Point();
+    /** The center of the shape. **/
     public var center:Point = new Point();
-    // private var debugG:Graphics = null;
+    /** An `nb.Graphics` instance used to draw debug visualizations. **/
+    private var debugG:Graphics = null;
 
+    /**
+     * Creates an `nb.shape.Shape` instance.
+     * 
+     * @param parent The parent object of the instance. 
+     **/
     public function new(?parent) {
         super(0,0,parent);
-        // debugG = nb.utils.Timer.time(() -> new Graphics(0,0,this), "obj3");
+        debugG = new Graphics(0,0);
     }
 
-    abstract public function withTransform(offset:Point):Shape;
+    /** Returns `true` if the shape contains the point `p`. **/
     abstract public function containsPoint(p:Point):Bool;
-    // abstract public function debugDraw(?color:Int):Void;
-    abstract public function getSupportPoint(vector:Point):Point;
-
-    override public function onRemove() {
-        // debugG.clear();
-        // debugG.remove();
-        super.onRemove();
-    }
+    /** Draws the debug visualizations of this instance. **/
+    abstract public function debugDraw(?color:Int):Void;
+    /** Removes the debug visualizations of this instance. **/
+    abstract public function clearDebugDraw():Void;
+    /** Returns the farthest points in the direction defined by `vector`. **/
+    abstract public function getFarthestPoints(vector:Point):Array<Point>;
 }

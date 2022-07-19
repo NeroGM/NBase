@@ -176,7 +176,7 @@ class Graph extends Object {
     }
 
     /** Returns the node with the coordinates of `p`. (There's a tiny tolerance value.) **/
-    public function getNodeAtPoint(p:Point):Node {
+    public function getNodeAtPoint(p:Point):Null<Node> {
         for (node in allNodes) if (node.x.equals(p.x) && node.y.equals(p.y)) return node;
         return null;
     }
