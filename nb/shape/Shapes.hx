@@ -42,10 +42,10 @@ class Shapes extends Object {
         var topP:Point = null;
         var botP:Point = null;
         for (shape in union) {
-            var rP = shape.getSupportPoint(new Point(1,0));
-            var lP = shape.getSupportPoint(new Point(-1,0));
-            var tP = shape.getSupportPoint(new Point(0,-1));
-            var bP = shape.getSupportPoint(new Point(0,1));
+            var rP = shape.getFarthestPoint(new Point(1,0));
+            var lP = shape.getFarthestPoint(new Point(-1,0));
+            var tP = shape.getFarthestPoint(new Point(0,-1));
+            var bP = shape.getFarthestPoint(new Point(0,1));
             if (rightP == null || rightP.x < rP.x) rightP = rP;
             if (leftP == null || leftP.x > lP.x) leftP = lP;
             if (topP == null || topP.y > tP.y) topP = tP;
@@ -104,7 +104,7 @@ class Shapes extends Object {
                     else if (dist > highestDist) { highestDist = dist; res = [p.sub(fromP)]; }
                 } 
             } else if (s is Circle) {
-                var p = cast(s,Circle).getSupportPoint(new Point(1,0));
+                var p = cast(s,Circle).getFarthestPoint(new Point(1,0));
                 var dist = p.distance(fromP);
                 if (dist == highestDist) res.push(p.sub(fromP));
                 else if (dist > highestDist) { highestDist = dist; res = [p.sub(fromP)]; }

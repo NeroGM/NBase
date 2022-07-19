@@ -43,7 +43,7 @@ class Polygon extends Shape {
         }
     }
 
-    public function getSupportPoint(vector:Point):Point {
+    public function getFarthestPoint(vector:Point):Point {
 		var highest:Null<Float> = null;
 		var result:Point = new Point();
 		for (p in points) {
@@ -89,10 +89,10 @@ class Polygon extends Shape {
     }
 
     public function updateFields() {
-        var rightP = getSupportPoint(new Point(1,0));
-        var leftP = getSupportPoint(new Point(-1,0));
-        var topP = getSupportPoint(new Point(0,-1));
-        var botP = getSupportPoint(new Point(0,1));
+        var rightP = getFarthestPoint(new Point(1,0));
+        var leftP = getFarthestPoint(new Point(-1,0));
+        var topP = getFarthestPoint(new Point(0,-1));
+        var botP = getFarthestPoint(new Point(0,1));
         setSize(Math.abs(rightP.x-leftP.x),Math.abs(topP.y-botP.y));
         center.set(leftP.x+size.w/2,topP.y+size.h/2);
     }

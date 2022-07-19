@@ -20,7 +20,7 @@ class Circle extends Shape {
         return col.ray;
     }
 
-    public function getSupportPoint(vector:Point):Point return vector.normalized().multiply(radius);
+    public function getFarthestPoint(vector:Point):Point return vector.normalized().multiply(radius);
 
     public function containsPoint(p:Point):Bool return col.contains(p);
 
