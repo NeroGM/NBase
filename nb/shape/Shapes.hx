@@ -6,20 +6,29 @@ using nb.ext.MathExt;
 using nb.ext.ArrayExt;
 import nb.Graph;
 
-class Shapes extends Object {
+/**
+ * Represents a shape made from multiple shapes.
+ *
+ * WARNING: It is only meant to work with polygons for now.
+ *
+ * @since 0.1.0
+ **/
+class Shapes extends Shape {
+    /** An array of `nb.shape.Shape` containing the individual shapes of this instance. **/
     public var shapes:Array<Shape> = [];
+    /** An array of `nb.shape.Shape` containing the shapes resulting from the union of `shapes`. **/
     public var union:Array<Shape> = [];
-    public var centroid:Point = null;
-    public var defs:Array<Shape.ShapeDef>;
-    public var center:Point = new Point();
 
-    public var debugG(default,null):Graphics;
+    /**
+     * Creates an `nb.shape.Shapes` instance.
+     * 
+     * @param parent The parent object of the instance.
+     **/
     public function new(?parent:h2d.Object) {
         super(parent);
-        debugG = new Graphics(0,0,this);
     }
 
-    // For now, should be used only for set of polygons
+    /** Adds a shape to this instance. (Expects polygons.) **/
     public function addShape(shape:Shape) {
         shapes.push(shape);
         addChild(shape);
@@ -27,12 +36,14 @@ class Shapes extends Object {
         updateFields();
     }
 
+    /** Adds multiple shapes to this instance. (Expects polygons.) **/
     public function addShapes(shapes:Array<Shape>) {
         for (shape in shapes) { this.shapes.push(shape); addChild(shape); }
         makeUnion();
         updateFields();
     }
 
+    /** Updates fields related to this instance's current attributes, as deduced from the shapes it contains. **/
     public function updateFields() {
         if (union.length == 0) return;
 
@@ -57,19 +68,17 @@ class Shapes extends Object {
         
         setSize(Math.abs(rightP.x-leftP.x),Math.abs(topP.y-botP.y));
         center.set(leftP.x+size.w/2,topP.y+size.h/2);
-    //    setOffset(-centroid.x,-centroid.y); How to deal with it
-    //    centroidToOrigin();
-    //    trace(size);
 
         defs = shapes.length == 1 ? shapes[0].defs.copy() : [COMPLEX];
     }
 
+    /** Returns `true` if the shape contains the point `p`. **/
     public function containsPoint(p:Point):Bool {
         for (shape in shapes) if (shape.containsPoint(p)) return true;
         return false;
     }
 
-    // Moves all shapes so that centroid is 0,0
+    /** Moves all shapes so that centroid is at (0,0). */
     public function centroidToOrigin() {
         for (s in shapes) {
             if (s is Polygon) {
@@ -86,12 +95,63 @@ class Shapes extends Object {
         centroid.set(0,0);
     }
 
+    /** Removes all shapes from this instance. **/
     public function clear() {
         for (s in shapes) s.remove();
         for (s in union) s.remove();
         shapes = []; union = [];
     }
 
+    /** Returns the farthest points in the direction defined by `vector`. **/
+    public function getFarthestPoints(vector:Point):Array<Point> {
+        var res:Array<Point> = [];
+        var highest:Null<Float> = null;
+        for (s in union) {
+            if (s is Polygon) {
+                for (p in cast(s,Polygon).points) {
+                    var p = p.clone();
+                    // if (entity != null && entity.parent != null) p.rotate(entity.parent.rotation); // use toGlobatPos ?
+                    var v = p.dot(vector);
+                    if (highest == null || v > highest) {
+                        highest = v;
+                        res = [p];
+                    } else if (v == highest) res.push(p);
+                }
+            } else if (s is Circle) {
+                var circ:Circle = cast(s,Circle);
+                if (circ.radius > highest) {
+                    highest = circ.radius;
+                    res = [circ.getFarthestPoints(vector)[0]];
+                } else if (circ.radius == highest) res.push(circ.getFarthestPoints(vector)[0]);
+            }
+        }
+        return res;
+    }
+
+    /**
+     * Draws the debug visualizations of this instance by calling the `debugDraw`
+     * functions of each shape in `union`.
+     **/
+    public function debugDraw(?color:Int) {
+        for (shape in union) shape.debugDraw(color);
+    }
+
+    /**
+     * Removes the debug visualizations of this instanceby calling the `debugDraw`
+     * functions of each shape in `union`.
+     **/
+    public function clearDebugDraw() {
+        for (shape in union) shape.clearDebugDraw();
+    }
+
+    /**
+     * Returns the farthest points of this shape from its center or centroid.
+     *
+     * @param fromCentroid If `true`, the points must be the farthest from the centroid.
+     * Otherwise they are the farthest from the center.
+     * @return An array of `h2d.col.Point`. Only the points that are the farthest are returned,
+     * not all the points of this shape from the farthest to the closest.
+     **/
     public function getFarthestPointsFrom(fromCentroid:Bool=true):Array<Point> {
         var highestDist:Float = 0;
         var res:Array<Point> = [];
@@ -113,6 +173,7 @@ class Shapes extends Object {
         return res;
     }
 
+    /** Returns the resulting shapes from the union of `shapes`. **/
     public function makeUnion():Array<Polygon> {
         var graph:Graph = new Graph(null,false,true);
         var segments:haxe.ds.Map<Polygon, Array<Segment>> = new haxe.ds.Map();
@@ -208,7 +269,9 @@ class Shapes extends Object {
                 res[c] = [fp];
             }
         }
-        
-        return [for (a in res) new Polygon(a)];
+
+        var pols:Array<Polygon> = [for (a in res) new Polygon(a)];
+        union = [for (p in pols) { addChild(p); cast(p,Shape); }];
+        return pols.copy();
     }
 }
