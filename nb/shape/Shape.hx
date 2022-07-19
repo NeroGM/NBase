@@ -32,13 +32,15 @@ abstract class Shape extends Object {
      **/
     public function new(?parent) {
         super(0,0,parent);
-        debugG = new Graphics(0,0,this);
+        debugG = new Graphics(0,0);
     }
 
     /** Returns `true` if the shape contains the point `p`. **/
     abstract public function containsPoint(p:Point):Bool;
     /** Draws the debug visualizations of this instance. **/
     abstract public function debugDraw(?color:Int):Void;
+    /** Removes the debug visualizations of this instance. **/
+    abstract public function clearDebugDraw():Void;
     /** Returns the farthest points in the direction defined by `vector`. **/
     abstract public function getFarthestPoints(vector:Point):Array<Point>;
 }

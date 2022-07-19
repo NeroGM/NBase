@@ -65,6 +65,13 @@ class Polygon extends Shape {
             debugG.params.lineColor = 0x00eaff;
             debugG.drawLine(midP.x,midP.y,midP.x-5*normal.x,midP.y-5*normal.y); // cyan to outside
         }
+        if (children[children.length-1] != debugG) addChild(debugG);
+    }
+
+    /** Removes the debug visualizations of this instance. **/
+    public function clearDebugDraw() {
+        debugG.clear();
+        debugG.remove();
     }
 
     /** Returns the farthest points in the direction defined by `vector`. **/
@@ -82,7 +89,6 @@ class Polygon extends Shape {
 		}
 		return result;
 	}
-
 
     /**
      * Gets a point on the edge of this polygon.

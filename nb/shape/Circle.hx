@@ -40,6 +40,13 @@ class Circle extends Shape {
         debugG.params.lineColor = color == null ? 0x880088 : color;
         debugG.drawCircle(0,0,radius,0);
         debugG.drawLine(0,0,radius,0);
+        if (children[children.length-1] != debugG) addChild(debugG);
+    }
+
+    /** Removes the debug visualizations of this instance. **/
+    public function clearDebugDraw() {
+        debugG.clear();
+        debugG.remove();
     }
 
     /**
