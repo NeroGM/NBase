@@ -29,8 +29,8 @@ class Circle extends Shape {
         setSize(radius*2,radius*2);
     }
 
-    /** Returns the farthest point in the direction defined by `vector`. **/
-    public function getFarthestPoint(vector:Point):Point return vector.normalized().multiply(radius);
+    /** Returns in an array the farthest point in the direction defined by `vector`. **/
+    public function getFarthestPoints(vector:Point):Array<Point> return [vector.normalized().multiply(radius)];
     /** Returns `true` if the shape contains the point `p`. **/
     public function containsPoint(p:Point):Bool return col.contains(p);
 

@@ -67,18 +67,18 @@ class Polygon extends Shape {
         }
     }
 
-    /** Returns the farthest point in the direction defined by `vector`. **/
-    public function getFarthestPoint(vector:Point):Point {
+    /** Returns the farthest points in the direction defined by `vector`. **/
+    public function getFarthestPoints(vector:Point):Array<Point> {
 		var highest:Null<Float> = null;
-		var result:Point = new Point();
+		var result:Array<Point> = [];
 		for (p in points) {
             var p = p.clone();
             // if (entity != null && entity.parent != null) p.rotate(entity.parent.rotation); // use toGlobatPos ?
 			var v = p.dot(vector);
 			if (highest == null || v > highest) {
 				highest = v;
-				result = p;
-			}
+				result = [p];
+			} else if (v == highest) result.push(p);
 		}
 		return result;
 	}
@@ -122,25 +122,25 @@ class Polygon extends Shape {
         return res;
     }
 
-    /** Updates fields related to this polygon current attributes, as deduced from `points`. **/
+    /** Updates fields related to this shape's current attributes, as deduced from `points`. **/
     public function updateFields() {
-        var rightP = getFarthestPoint(new Point(1,0));
-        var leftP = getFarthestPoint(new Point(-1,0));
-        var topP = getFarthestPoint(new Point(0,-1));
-        var botP = getFarthestPoint(new Point(0,1));
+        var rightP = getFarthestPoints(new Point(1,0))[0];
+        var leftP = getFarthestPoints(new Point(-1,0))[0];
+        var topP = getFarthestPoints(new Point(0,-1))[0];
+        var botP = getFarthestPoints(new Point(0,1))[0];
         setSize(Math.abs(rightP.x-leftP.x),Math.abs(topP.y-botP.y));
         center.set(leftP.x+size.w/2,topP.y+size.h/2);
     }
 
     /**
-     * Returns the farthest points of this polygon from its center or centroid.
+     * Returns the farthest points of this shape from its center or centroid.
      *
      * @param fromCentroid If `true`, the points must be the farthest from the centroid.
      * Otherwise they are the farthest from the center.
      * @return An array of `h2d.col.Point`. Only the points that are the farthest are returned,
-     * not all the points of this polygon from the farthest to the closest.
+     * not all the points of this shape from the farthest to the closest.
      **/
-    public function getFarthestPoints(fromCentroid:Bool=true):Array<Point> {
+    public function getFarthestPointsFrom(fromCentroid:Bool=true):Array<Point> {
         var highestDist:Float = 0;
         var res:Array<Point> = [];
         for (p in points) {

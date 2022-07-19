@@ -96,15 +96,15 @@ class PointExt {
      * @param direction Defines a direction where (1,0) is right and (0,1) is down.
      * @return The farthest point in the array. (No copy is done.)
      **/
-    public static function getFarthestPoint(points:Array<Point>, direction:Point):Point {
+    public static function getFarthestPoints(points:Array<Point>, direction:Point):Array<Point> {
 		var highest:Float = Math.NEGATIVE_INFINITY;
-		var result:Point = null;
+		var result:Array<Point> = [];
 		for (p in points) {
 			var v = p.dot(direction);
 			if (v > highest) {
 				highest = v;
-				result = p;
-			}
+				result = [p];
+			} else if (v == highest) result.push(p);
 		}
 		return result;
 	}

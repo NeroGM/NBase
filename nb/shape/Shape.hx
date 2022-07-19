@@ -39,6 +39,6 @@ abstract class Shape extends Object {
     abstract public function containsPoint(p:Point):Bool;
     /** Draws the debug visualizations of this instance. **/
     abstract public function debugDraw(?color:Int):Void;
-    /** Returns the farthest point in the direction defined by `vector`. **/
-    abstract public function getFarthestPoint(vector:Point):Point;
+    /** Returns the farthest points in the direction defined by `vector`. **/
+    abstract public function getFarthestPoints(vector:Point):Array<Point>;
 }

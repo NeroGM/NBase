@@ -42,10 +42,10 @@ class Shapes extends Object {
         var topP:Point = null;
         var botP:Point = null;
         for (shape in union) {
-            var rP = shape.getFarthestPoint(new Point(1,0));
-            var lP = shape.getFarthestPoint(new Point(-1,0));
-            var tP = shape.getFarthestPoint(new Point(0,-1));
-            var bP = shape.getFarthestPoint(new Point(0,1));
+            var rP = shape.getFarthestPoints(new Point(1,0))[0];
+            var lP = shape.getFarthestPoints(new Point(-1,0))[0];
+            var tP = shape.getFarthestPoints(new Point(0,-1))[0];
+            var bP = shape.getFarthestPoints(new Point(0,1))[0];
             if (rightP == null || rightP.x < rP.x) rightP = rP;
             if (leftP == null || leftP.x > lP.x) leftP = lP;
             if (topP == null || topP.y > tP.y) topP = tP;
@@ -92,7 +92,7 @@ class Shapes extends Object {
         shapes = []; union = [];
     }
 
-    public function getFarthestPoints(fromCentroid:Bool=true):Array<Point> {
+    public function getFarthestPointsFrom(fromCentroid:Bool=true):Array<Point> {
         var highestDist:Float = 0;
         var res:Array<Point> = [];
         var fromP:Point = fromCentroid ? centroid : center;
@@ -104,7 +104,7 @@ class Shapes extends Object {
                     else if (dist > highestDist) { highestDist = dist; res = [p.sub(fromP)]; }
                 } 
             } else if (s is Circle) {
-                var p = cast(s,Circle).getFarthestPoint(new Point(1,0));
+                var p = cast(s,Circle).getFarthestPoints(new Point(1,0))[0];
                 var dist = p.distance(fromP);
                 if (dist == highestDist) res.push(p.sub(fromP));
                 else if (dist > highestDist) { highestDist = dist; res = [p.sub(fromP)]; }
@@ -176,7 +176,7 @@ class Shapes extends Object {
         } 
 
         var points:Array<Point> = [for (node in networks[0]) new Point(node.x,node.y)];
-        var fp = points.getFarthestPoint(new Point(1,1));
+        var fp = points.getFarthestPoints(new Point(1,1))[0];
         var onNode = graph.getNodeAtPoint(fp);
         var startNode = onNode;
         var dir = new Point(1,1);
@@ -201,7 +201,7 @@ class Shapes extends Object {
 
                 c++;
                 var points = [for (node in networks[c]) new Point(node.x,node.y)];
-                var fp = points.getFarthestPoint(new Point(1,1));
+                var fp = points.getFarthestPoints(new Point(1,1))[0];
                 onNode = graph.getNodeAtPoint(fp);
                 startNode = onNode;
                 dir = new Point(1,1);
