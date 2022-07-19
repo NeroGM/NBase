@@ -6,7 +6,7 @@ class Circle extends Shape {
 
     public function new(radius:Float, ?cx:Float=0, ?cy:Float=0, ?parent:h2d.Object) {
         super(parent);
-        types.push(CIRCLE);
+        defs.push(CIRCLE);
 
         col = new h2d.col.Circle(cx,cy,radius);
         center.set(cx,cy);

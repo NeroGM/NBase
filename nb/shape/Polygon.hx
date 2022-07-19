@@ -11,7 +11,7 @@ class Polygon extends Shape {
         if (points.length < 3) throw "You need at least 3 points for the polygon.";
         super(parent);
 
-        types.push(POLYGON);
+        defs.push(POLYGON);
         this.points = points;
         centroid = points.centroid();
         rightSideFaceInside = points.toSegments()[0].side(centroid) >= 0;

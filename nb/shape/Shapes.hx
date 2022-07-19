@@ -10,7 +10,7 @@ class Shapes extends Object {
     public var shapes:Array<Shape> = [];
     public var union:Array<Shape> = [];
     public var centroid:Point = null;
-    public var types:Array<Shape.ShapeType>;
+    public var defs:Array<Shape.ShapeDef>;
     public var center:Point = new Point();
 
     public var debugG(default,null):Graphics;
@@ -61,7 +61,7 @@ class Shapes extends Object {
     //    centroidToOrigin();
     //    trace(size);
 
-        types = shapes.length == 1 ? shapes[0].types.copy() : [COMPLEX];
+        defs = shapes.length == 1 ? shapes[0].defs.copy() : [COMPLEX];
     }
 
     public function containsPoint(p:Point):Bool {

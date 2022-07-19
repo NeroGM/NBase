@@ -2,15 +2,15 @@ package nb.shape;
 
 import nb.Graphics;
 
-enum ShapeType {
-    POLYGON;
+enum ShapeDef {
     CIRCLE;
-    COMPLEX;
+    POLYGON;
     RECTANGLE;
+    COMPLEX;
 }
 
 abstract class Shape extends Object {
-    public var types(default, null):Array<ShapeType> = [];
+    public var defs(default, null):Array<ShapeDef> = [];
     public var centroid:Point = new Point();
     public var center:Point = new Point();
     private var debugG:Graphics = null;
