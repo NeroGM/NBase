@@ -116,112 +116,108 @@ class Shapes extends Object {
     public function makeUnion() {
         var graph = new Graph(null,false,true);
         var checkedShapes:Array<Shape> = [];
-        var savedNodes:haxe.ds.Map<Polygon,Array<nb.Graph.Node>> = [];
-        var savedSegments:haxe.ds.Map<Int,Array<Segment>> = new haxe.ds.Map();
-
+        var pols:Array<Polygon> = [];
+        var segments:haxe.ds.Map<Polygon, Array<Segment>> = new haxe.ds.Map();
+        var checkedSegs:Array<Array<Segment>> = [];
+        
         if (shapes.length < 2) return null;
 
-        // Make graph
-        var p1:Point = null;
-        var p2:Point = null;
-        for (shape1 in shapes) {
-            if (shape1 is Polygon) {
-                var pol1 = cast(shape1,Polygon);
-                if (savedSegments[shape1.objId] == null) savedSegments[shape1.objId] = pol1.toSegments();
-                var segments1:Array<Segment> = savedSegments[shape1.objId];
-                var i1Offset:Int = 0;
-                for (i1 in 0...1000) {
-                    var v1 = i1 + i1Offset;
-                    if (v1 == segments1.length) break;
+        for (shape in shapes) if (shape is Polygon) {
+            var pol = cast(shape,Polygon);
+            pols.push(pol);
+            segments[pol] = pol.toSegments();
+        }
 
-                    var seg1 = segments1[v1];
-                    var nodeP1:Graph.Node = null;
-                    var nodeP2:Graph.Node = null;
-                    p1 = seg1.getA();
-                    p2 = seg1.getB();
-                    // trace("tracing1: " + p1 + "   " + p2);
-                    
-                    if (v1 == 0) {
-                        nodeP1 = graph.addNode(p1);
-                        savedNodes[pol1] = [nodeP1];
-                    } else nodeP1 = savedNodes[pol1][v1];
-                    if (v1 != segments1.length-1) {
-                        nodeP2 = graph.addNode(p2);
-                        savedNodes[pol1].push(nodeP2);
-                    } else nodeP2 = savedNodes[pol1].at(v1+1);
+        var segmentsIt = segments.iterator();
+        for (segs1 in segments.iterator()) {
+            for (iSeg1 in 0...segs1.length) {
+                var seg1 = segs1[iSeg1];
+                var startP = seg1.getA();
+                var endP = seg1.getB();
 
-                    if (checkedShapes.length == 0) {
-                        graph.connect(nodeP1,[nodeP2]);
-                        // trace("conn1: " + new Point(nodeP1.x,nodeP1.y) + "    " + new Point(nodeP2.x,nodeP2.y));
-                    } else {
-                        var b:Bool = false;
-                        for (shape2 in checkedShapes) {
-                            if (shape2 is Polygon) {
-                                var pol2 = cast(shape2,Polygon);
-                                if (savedSegments[shape2.objId] == null) savedSegments[shape2.objId] = pol2.toSegments();
-                                var segments2:Array<Segment> = savedSegments[shape2.objId];
-
-                                var savedNode:Graph.Node = null;
-                                var i2Offset:Int = 0;
-                                for (i2 in 0...1000) {
-                                    var v1 = i1+i1Offset;
-                                    var v2 = i2+i2Offset;
-                                    if (v2 == segments2.length) break;
-
-                                    var seg1 = segments1[v1];
-                                    var seg2 = segments2[v2];
-                                    var p1 = seg1.getA();
-                                    var p2 = seg1.getB();
-                                    var p3 = seg2.getA();
-                                    var p4 = seg2.getB();
-
-                                    var inters:Point = new Point();
-                                    var coll = nb.phys.Collision.checkSegments(p1,p2,p3,p4,inters);
-                                    // trace("check: "+ p1 + "  " + p2 +"   " +p3+ "   " + p4+ "   "+ coll);
-                                    // trace(v1 + "  " + v2);
-                                    if (coll > 0) {
-                                        segments1.remove(segments1[v1]);
-                                        segments1.insert(v1,new Segment(p1,inters));
-                                        segments1.insert(v1+1,new Segment(inters,p2));
-
-                                        segments2.remove(segments2[v2]);
-                                        segments2.insert(v2,new Segment(p3,inters));
-                                        segments2.insert(v2+1,new Segment(inters,p4));
-
-                                        var connTo:Array<nb.Graph.Node> = [savedNode == null ? nodeP1 : savedNode];
-                                        
-                                        var nodeP3 = savedNodes[pol2][v2];
-                                        var nodeP4 = savedNodes[pol2].at(v2+1);
-
-                                        graph.disconnect(nodeP3,[nodeP4]);
-                                        connTo.push(nodeP3);
-                                        connTo.push(nodeP4);
-
-                                        var nodeInters = graph.addNode(inters);
-                                        graph.connect(nodeInters, connTo);
-                                        // trace("conn2: " + new Point(nodeInters.x,nodeInters.y) + "    " + [for (n in connTo) new Point(n.x,n.y)]);
-
-                                        savedNodes[pol1].insert(v1+1,nodeInters);
-                                        savedNodes[pol2].insert(v2+1,nodeInters);
-                                        i1Offset++;
-                                        i2Offset++;
-                                        savedNode = nodeInters;
-                                        b = true;
-                                    }
-                                }
-                                if (savedNode != null) graph.connect(savedNode,[nodeP2]);
+                var seg1Inters:Array<Point> = [];
+                var recycNodes:haxe.ds.Map<Int,Node> = [];
+                for (segs2 in segments.iterator()) if (segs1 != segs2) {
+                    for (seg2 in segs2) {
+                        var res = seg1.checkSeg(seg2);
+                        
+                        if (res != null) {
+                            var resP = cast(res[0], Point);
+                            if (resP.equals(startP) || resP.equals(endP)) continue;
+                            var intersP = resP;
+                            seg1Inters.push(resP);
+                            if (checkedSegs.contains(segs2)) {
+                                var node = graph.getNodeAtPoint(intersP);
+                                if (node != null) recycNodes[seg1Inters.length-1] = node;
                             }
                         }
-                        if (!b) {
-                            graph.connect(nodeP1, [nodeP2]);
-                            // trace("conn3: " + new Point(nodeP1.x,nodeP1.y) + "    " + new Point(nodeP2.x,nodeP2.y));
-                        }
                     }
-                    
                 }
-                checkedShapes.push(shape1);
+                
+                
+                seg1Inters.quickSort((a,b) -> startP.distance(a) < startP.distance(b));
+
+                var startNode = graph.getNodeAtPoint(startP);
+                if (startNode == null) { startNode = graph.addNode(startP); trace("new start node: " + startP); }
+                else trace("recup startnode: " + startP);
+
+                var prevNode:Graph.Node = startNode;
+                trace("inters:"+seg1Inters);
+                for (i in 0...seg1Inters.length) {
+                    var p = seg1Inters[i];
+                    var node:Graph.Node = null;
+                    for (n in recycNodes) if (new Point(n.x,n.y).equals(p)) { node = n; break; }
+                    if (node == null) node = graph.addNode(p);
+                    if (recycNodes[i] != null) trace("recyc: " + new Point(recycNodes[i].x, recycNodes[i].y));
+                    graph.connect(prevNode,[node]);
+                    trace("connect: "+new Point(prevNode.x,prevNode.y) + "   " + new Point(node.x,node.y));
+                    prevNode = node;
+                }
+
+                var endNode = graph.getNodeAtPoint(endP);
+                if (endNode == null) { endNode = graph.addNode(endP); trace("new end node: " + endP); }
+                else trace("recup endnode: " + endP);
+                graph.connect(prevNode,[endNode]);
+                trace("connect2:" + new Point(prevNode.x,prevNode.y) + "   " + new Point(endNode.x,endNode.y));
             }
+            checkedSegs.push(segs1);
         }
-        return graph;
+
+        
+
+        // Get graph perimeter then return it
+
+        var allNodes = graph.allNodes;
+        var points:Array<Point> = [for (node in graph.allNodes) new Point(node.x,node.y)];
+        var fp = points.getFarthestPoint(new Point(1,1));
+        var onNode = graph.getNodeAtPoint(fp);
+        var startNode = onNode;
+        var dir = new Point(1,1);
+        var res:Array<Point> = [fp];
+        while (onNode != null) {
+            var pp = new Point(onNode.x,onNode.y);
+            trace("on:" + pp.toString() + "  dir:" + dir);
+            var a = [for (n in onNode.connections) new Point(n.x,n.y)];
+            trace(a);
+            a.clockwiseSort(pp, dir);
+            trace(a);
+            for (i in 0...a.length) {
+                var dir2 = a[0].sub(pp).normalized();
+                trace("f"+dir2);
+                if (dir.equals(dir2) || pp.equals(a[0])) a.shift();
+                else break;
+            }
+            // var v = onNode == startNode ? 0 : 1;
+            res.push(a[0]);
+            // if (a.length == 1) break;
+            dir = res[res.length-2].sub(a[0]).normalized();
+
+            for (n in onNode.connections) if (n.x == a[0].x && n.y == a[0].y) { onNode = n; break; }
+            if (onNode.x == startNode.x && onNode.y == startNode.y) break;
+        }
+
+        res.pop();
+        // return graph;
+        return new Polygon(res);
     }
 }
