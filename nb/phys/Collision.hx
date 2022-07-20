@@ -109,4 +109,119 @@ class Collision {
 
 		return -2; // Not parallel + Not intersecting = -2
 	}
+
+	/** Returns the intersection points between a polygon and a circle. **/
+	public static function getIntersectionsPolCir(pol:Polygon, cir:Circle, ?relativeTo:h2d.Object):Array<Point> {
+		var p = cir.localToGlobal();
+		var circle = new h2d.col.Circle(p.x,p.y,cir.radius);
+		var points:Array<Point> = [];
+		for (s in pol.toSegments()) {
+			var seg = new Segment(pol.localToGlobal(new Point(s.x,s.y)),pol.localToGlobal(new Point(s.x+s.dx,s.y+s.dy)));
+			var a = checkCircleSegment(seg,circle);
+			if (a != null) for (p in a) points.push(p.relativeTo(relativeTo == null ? pol.getScene() : relativeTo));
+		}
+
+		return points;
+	}
+
+	/** Returns the intersection points between two polygons. **/
+	public static function getIntersectionsPolPol(pol1:Polygon, pol2:Polygon, ?relativeTo:h2d.Object):Array<Point> {		
+		var a = [pol1,pol2];
+		for (i in 0...2) {
+			var polygon1 = a[i];
+			var polygon2 = a[(i+1)%2];
+			var segments = polygon1.points.toSegments();
+			for (segment in segments) {
+				var allInFront:Bool = true;
+				var rsfi = polygon1.rightSideFaceInside;
+				for (p in polygon2.points) {
+					var p2 = polygon1.globalToLocal(polygon2.localToGlobal(p.clone()));
+					var side = segment.side(p2);
+					if ((rsfi && side >= 0) || (!rsfi && side < 0)) { allInFront = false; break; }
+				}
+				if (allInFront) return [];
+			}
+		}
+
+		var intersections:Array<Point> = [];
+		for (seg1 in pol1.toSegments()) for (seg2 in pol2.toSegments()) {
+			var p1 = pol1.localToGlobal(seg1.getA());
+			var p2 = pol1.localToGlobal(seg1.getB());
+			var p3 = pol2.localToGlobal(seg2.getA());
+			var p4 = pol2.localToGlobal(seg2.getB());
+			var inters:Point = new Point();
+			if (checkSegments(p1,p2,p3,p4,inters) > 0) {
+				intersections.push(inters.relativeTo(relativeTo == null ? pol1.getScene() : relativeTo));
+			}
+		}
+		return intersections;
+	}
+
+	/** Returns the intersection points between two circles. **/
+	public static function getIntersectionsCirCir(cir1:Circle, cir2:Circle, ?relativeTo:h2d.Object):Array<Point> {
+		var rel = relativeTo == null ? cir1.getScene() : relativeTo;
+
+		var p1 = cir1.localToGlobal(new Point(cir1.col.x,cir1.col.y));
+		var p2 = cir2.localToGlobal(new Point(cir2.col.x,cir2.col.y));
+		var r1 = cir1.radius;
+		var r2 = cir2.radius;
+		var d = p1.distance(p2);
+
+		if (d > r1+r2 || d < Math.abs(r1-r2)) return [];
+		else if (d == 0 && r1 == r2) return [p1.relativeTo(rel)];
+
+		var a = (r1*r1-r2*r2+d*d) / (2*d);
+		var h = Math.sqrt(r1*r1-a*a);
+		var ray = h2d.col.Ray.fromPoints(p1, p2);
+		var p3 = ray.getPoint(a);
+
+		var p4 = new Point(p3.x + h*(p2.y-p1.y)/d, p3.y - h*(p2.x-p1.x)/d).relativeTo(rel);
+		var p5 = new Point(p3.x - h*(p2.y-p1.y)/d, p3.y + h*(p2.x-p1.x)/d).relativeTo(rel);
+		return [p4,p5];
+	}
+
+	// https://stackoverflow.com/questions/1073336/circle-line-segment-collision-detection-algorithm
+	public static function checkCircleSegment(seg:Segment,circle:h2d.col.Circle):Array<Point> {
+		var d = new Point(seg.dx,seg.dy);
+		var f = seg.getA().sub(new Point(circle.x,circle.y));
+		var r = circle.ray;
+
+		var a = d.dot(d);
+		var b = 2*f.dot(d);
+		var c = f.dot(f) - r*r;
+
+		var discriminant = b*b-4*a*c;
+		if( discriminant < 0 ) return []; // No intersection
+
+		discriminant = Math.sqrt( discriminant );
+		// either solution may be on or off the ray so need to test both
+		// t1 is always the smaller value, because BOTH discriminant and
+		// a are nonnegative.
+		var t1 = (-b - discriminant)/(2*a);
+		var t2 = (-b + discriminant)/(2*a);
+
+		// 3x HIT cases:
+		//          -o->             --|-->  |            |  --|->
+		// Impale(t1 hit,t2 hit), Poke(t1 hit,t2>1), ExitWound(t1<0, t2 hit), 
+		
+		// 3x MISS cases:
+		//       ->  o                     o ->              | -> |
+		// FallShort (t1>1,t2>1), Past (t1<0,t2<0), CompletelyInside(t1<0, t2>1)
+		
+		if (t1 >= 0 && t1 <= 1) { // Poke
+			var res = [new Point(seg.x+t1*d.x,seg.y+t1*d.y)];
+
+			if (t2 >= 0 && t2 <= 1) { // Impale
+				var p = new Point(seg.x+t2*d.x,seg.y+t2*d.y);
+				if (!p.x.equals(res[0].x) || !p.y.equals(res[0].y)) res.push(p);
+			}
+
+			return res;
+		}
+
+		if (t2 >= 0 && t2 <= 1) return [new Point(seg.x+t2*d.x,seg.y+t2*d.y)]; // ExitWound
+
+		// No intersection : FallShort || Past || CompletelyInside
+		return [];
+	}
 }
