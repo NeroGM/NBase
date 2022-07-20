@@ -59,6 +59,9 @@ class Manager {
 
 	/** All `nb.Scene`s instances active. **/
 	public static var createdScenes:Array<Scene> = [];
+
+	/** Whether this class should use traces. `true` by default if compiler flag `debug` is defined. **/
+	public static var logging:Bool = #if debug true #else false #end;
 	
 	/** Initializes this class. It needs to be done once before being used and have `neroFS` set. **/
 	public static function init(app:hxd.App, ?w:Int=300, ?h:Int=300, onFinished:Void->Void) {
@@ -126,18 +129,14 @@ class Manager {
 			newName = name + (++i);
 		}
 		if (newName != null) { 
-			trace("Duplicate scene name '"+name+"' changed to '"+newName+"'.");
+			if (logging) trace("Duplicate scene name '"+name+"' changed to '"+newName+"'.");
 			name = newName;
 		}
 
-		#if debug
-		haxe.Log.trace('----- CREATING SCENE : $sceneClass($name) -----', null);
-		#end
+		if (logging) haxe.Log.trace('----- CREATING SCENE : $sceneClass($name) -----', null);
 		var s:Scene = Type.createInstance(sceneClass, args == null ? [] : args);
 		scenes.set(name, s);
-		#if debug
-		haxe.Log.trace('----- CREATED -----', null);
-		#end
+		if (logging) haxe.Log.trace('----- CREATED -----', null);
 		return s;
 	}
 	
@@ -151,21 +150,15 @@ class Manager {
 	public static function changeScene(name:String, ?disposeScene:Bool = false):Scene {
 		var s:Scene = scenes.get(name);
 		if (s == null) {
-			#if debug
-		 	trace("There is no " + name + " scene.");
-			#end
+		 	if (logging) trace("There is no " + name + " scene.");
 			return null;
 		} else if (s == Manager.currentScene) {
-			#if debug
-		 	trace("You are already on scene " + name + ".");
-			#end
+			if (logging) trace("You are already on scene " + name + ".");
 			return null;
 		}
 		if (disposeScene) {
 			scenes.remove(currentSceneName);
-			#if debug
-			trace("Scene disposed : " + currentSceneName);
-			#end
+			if (logging) trace("Scene disposed : " + currentSceneName);
 		}
 		
 		var newMainCamera = s.cam;
@@ -183,9 +176,9 @@ class Manager {
 		
 		if (!s.firstLoaded) s.onFirstLoad();
 		s.onFocus();
-		#if debug
-		trace("Scene loaded : " + name);
-		#end
+
+		if (logging) trace("Scene loaded : " + name);
+
 		return currentScene;
 	}
 	
