@@ -111,6 +111,31 @@ class Collision {
 	}
 
 	/**
+	 * Returns the intersection points between two shapes.
+	 *
+	 * Those two shapes should be in the same scene, otherwise the result is undefined.
+	 *
+	 * @param shape1 The first `nb.shape.Shape` instance.
+	 * @param shape2 The second `nb.shape.Shape` instance.
+	 * @param relativeTo The intersection points be will be in this object's coordinate space.
+	 * If `null`, the intersection points will be in the coordinate space of `shape1`'s scene.
+	 * @return An array containing the intersections points.
+	 * `null` if there's no function implemented for these two shape types.
+	 **/
+	public static function getIntersections(shape1:Shape, shape2:Shape, ?relativeTo:h2d.Object):Array<Point> {
+		if (shape1 is Polygon && shape2 is Circle)
+			return getIntersectionsPolCir(cast(shape1,Polygon),cast(shape2,Circle),relativeTo);
+		else if (shape1 is Circle && shape2 is Polygon)
+			return getIntersectionsPolCir(cast(shape2,Polygon),cast(shape1,Circle),relativeTo);
+		else if (shape1 is Polygon && shape2 is Polygon)
+			return getIntersectionsPolPol(cast(shape1,Polygon),cast(shape2,Polygon),relativeTo);
+		else if (shape1 is Circle && shape2 is Circle)
+			return getIntersectionsCirCir(cast(shape1,Circle),cast(shape2,Circle),relativeTo);
+
+		return null;
+	}
+
+	/**
 	 * Returns the intersection points between a polygon and a circle.
 	 *
 	 * Those two shapes should be in the same scene, otherwise the result is undefined.
