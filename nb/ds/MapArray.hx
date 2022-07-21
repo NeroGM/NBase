@@ -98,15 +98,15 @@ class MapArrayKIterator<T> {
 	var aLength:Int = 0;
 	var ma:MapArray<T>;
 
-	public function new(ma:MapArray<T>) {
+	public inline function new(ma:MapArray<T>) {
 		this.ma = ma;
 	}
 
-	public function hasNext():Bool {
+	public inline function hasNext():Bool {
 		return nextIndex < ma.length;
 	}
 
-	public function next():String {
+	public inline function next():String {
 		var address = ma[nextIndex++];
 		return address.name;
 	}
@@ -118,15 +118,15 @@ class MapArrayVIterator<T> {
 	var aLength:Int = 0;
 	var ma:MapArray<T>;
 
-	public function new(ma:MapArray<T>) {
+	public inline function new(ma:MapArray<T>) {
 		this.ma = ma;
 	}
 
-	public function hasNext():Bool {
+	public inline function hasNext():Bool {
 		return nextIndex < ma.length;
 	}
 
-	public function next():T {
+	public inline function next():T {
 		var address = ma[nextIndex++];
 		return address.data;
 	}
@@ -138,15 +138,15 @@ class MapArrayKVIterator<T> {
 	var aLength:Int = 0;
 	var ma:MapArray<T>;
 
-	public function new(ma:MapArray<T>) {
+	public inline function new(ma:MapArray<T>) {
 		this.ma = ma;
 	}
 
-	public function hasNext():Bool {
+	public inline function hasNext():Bool {
 		return nextIndex < ma.length;
 	}
 
-	public function next():{key:String, value:T} {
+	public inline function next():{key:String, value:T} {
 		var address = ma[nextIndex++];
 		return {key:address.name,value:address.data};
 	}
