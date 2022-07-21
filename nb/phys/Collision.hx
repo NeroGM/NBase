@@ -117,7 +117,7 @@ class Collision {
 		var points:Array<Point> = [];
 		for (s in pol.toSegments()) {
 			var seg = new Segment(pol.localToGlobal(new Point(s.x,s.y)),pol.localToGlobal(new Point(s.x+s.dx,s.y+s.dy)));
-			var a = checkCircleSegment(seg,circle);
+			var a = getIntersectionsSegCir(seg,circle);
 			if (a != null) for (p in a) points.push(p.relativeTo(relativeTo == null ? pol.getScene() : relativeTo));
 		}
 
@@ -181,7 +181,7 @@ class Collision {
 	}
 
 	// https://stackoverflow.com/questions/1073336/circle-line-segment-collision-detection-algorithm
-	public static function checkCircleSegment(seg:Segment,circle:h2d.col.Circle):Array<Point> {
+	public static function getIntersectionsSegCir(seg:Segment,circle:h2d.col.Circle):Array<Point> {
 		var d = new Point(seg.dx,seg.dy);
 		var f = seg.getA().sub(new Point(circle.x,circle.y));
 		var r = circle.ray;
