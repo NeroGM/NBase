@@ -149,14 +149,14 @@ class Collision {
 	public static function getIntersectionsPolCir(pol:Polygon, cir:Circle, ?relativeTo:h2d.Object):Array<Point> {
 		var p = cir.localToGlobal();
 		var circle = new h2d.col.Circle(p.x,p.y,cir.radius);
-		var points:Array<Point> = [];
+		var points:Set<Point> = new Set();
 		for (s in pol.toSegments()) {
 			var seg = new Segment(pol.localToGlobal(new Point(s.x,s.y)),pol.localToGlobal(new Point(s.x+s.dx,s.y+s.dy)));
 			var a = getIntersectionsSegCir(seg,circle);
-			if (a != null) for (p in a) points.push(p.relativeTo(relativeTo == null ? pol.getScene() : relativeTo));
+			if (a != null) for (p in a) points.add(p.relativeTo(relativeTo == null ? pol.getScene() : relativeTo));
 		}
 
-		return points;
+		return points.toArray();
 	}
 
 	/**
@@ -188,7 +188,7 @@ class Collision {
 			}
 		}
 
-		var intersections:Array<Point> = [];
+		var intersections:Set<Point> = new Set();
 		for (seg1 in pol1.toSegments()) for (seg2 in pol2.toSegments()) {
 			var p1 = pol1.localToGlobal(seg1.getA());
 			var p2 = pol1.localToGlobal(seg1.getB());
@@ -196,10 +196,10 @@ class Collision {
 			var p4 = pol2.localToGlobal(seg2.getB());
 			var inters:Point = new Point();
 			if (checkSegments(p1,p2,p3,p4,inters) > 0) {
-				intersections.push(inters.relativeTo(relativeTo == null ? pol1.getScene() : relativeTo));
+				intersections.add(inters.relativeTo(relativeTo == null ? pol1.getScene() : relativeTo));
 			}
 		}
-		return intersections;
+		return intersections.toArray();
 	}
 
 	/**
