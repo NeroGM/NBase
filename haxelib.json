@@ -4,12 +4,12 @@
   "license": "Public",
   "tags": ["game", "heaps", "cross"],
   "description": "A library powered by Heaps for making games.",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "contributors": ["NeroGM"],
   "dependencies": {
     "heaps":"git:https://github.com/HeapsIO/heaps#d9880006b83982",
     "ase":"git:https://github.com/miriti/ase#8726e7d2810a"
   },
 
-  "releasenote": "Patch - 13 July 2022 (See CHANGELOG.md for details)"
+  "releasenote": "The Graph, Shapes and Tiled Release - 21 July 2022 (See CHANGELOG.md for details)"
 }
