@@ -1,1 +1,1 @@
-haxelib run dox -i docs/ -o documentation/ -ex src -ex sys -ex format -ex nb.utils
+haxelib run dox -i docs/ -o documentation/ -D version "0.2.0" -ex src -ex sys -ex format -ex nb.utils

@@ -32,10 +32,10 @@ class SubScene extends Object {
      * Creates an `nb.SubScene` instance.
      * 
      * @param x The subscene's x coordinate on the parent scene.
-	 * @param y The instance's y coordinate on the parent scene.
+     * @param y The instance's y coordinate on the parent scene.
      * @param w The width of the subscene.
      * @param h The height of the subscene.
-	 * @param scene The scene it is displaying.
+     * @param scene The scene it is displaying.
      * @param parent The parent object of the subscene.
      **/
     override public function new(x:Float, y:Float, w:Int, h:Int, scene:Scene, ?parent:h2d.Object) {
