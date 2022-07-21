@@ -174,8 +174,8 @@ class Polygon extends Shape {
     /**
      * Returns the minkowski difference between two polygons.
      * 
-     * Here are some nice properties of the minkowski difference:
-     * - If it contains the origin, that means the two shapes intersects.
+     * Here are some nice properties of the minkowski difference: <br/>
+     * - If it contains the origin, that means the two shapes intersects. <br/>
      * - The minimum distance between the origin and the points of the minkowski difference
      * is the distance between the two shapes.
      * 

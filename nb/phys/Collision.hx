@@ -119,7 +119,7 @@ class Collision {
 	 * @param shape2 The second `nb.shape.Shape` instance.
 	 * @param relativeTo The intersection points be will be in this object's coordinate space.
 	 * If `null`, the intersection points will be in the coordinate space of `shape1`'s scene.
-	 * @return An array containing the intersections points.
+	 * @return An array containing the intersection points.
 	 * `null` if there's no function implemented for these two shape types.
 	 **/
 	public static function getIntersections(shape1:Shape, shape2:Shape, ?relativeTo:h2d.Object):Array<Point> {
@@ -144,7 +144,7 @@ class Collision {
 	 * @param cir An `nb.shape.Circle` instance.
 	 * @param relativeTo The intersection points be will be in this object's coordinate space.
 	 * If `null`, the intersection points will be in the coordinate space of `pol`'s scene.
-	 * @return An array containing the intersections points.
+	 * @return An array containing the intersection points.
 	 **/
 	public static function getIntersectionsPolCir(pol:Polygon, cir:Circle, ?relativeTo:h2d.Object):Array<Point> {
 		var p = cir.localToGlobal();
@@ -168,7 +168,7 @@ class Collision {
 	 * @param pol2 A second `nb.shape.Polygon` instance.
 	 * @param relativeTo The intersection points be will be in this object's coordinate space.
 	 * If `null`, the intersection points will be in the coordinate space of `pol1`'s scene.
-	 * @return An array containing the intersections points.
+	 * @return An array containing the intersection points.
 	 **/
 	public static function getIntersectionsPolPol(pol1:Polygon, pol2:Polygon, ?relativeTo:h2d.Object):Array<Point> {		
 		var a = [pol1,pol2];
@@ -211,7 +211,7 @@ class Collision {
 	 * @param cir2 A second `nb.shape.Circle` instance.
 	 * @param relativeTo The intersection points be will be in this object's coordinate space.
 	 * If `null`, the intersection points will be in the coordinate space of `cir1`'s scene.
-	 * @return An array containing the intersections points.
+	 * @return An array containing the intersection points.
 	 **/
 	public static function getIntersectionsCirCir(cir1:Circle, cir2:Circle, ?relativeTo:h2d.Object):Array<Point> {
 		var rel = relativeTo == null ? cir1.getScene() : relativeTo;
@@ -242,7 +242,7 @@ class Collision {
 	 *
 	 * @param seg An `h2d.col.Segment` instance.
 	 * @param circle An `h2d.col.Circle` instance.
-	 * @return An array containing the intersections points.
+	 * @return An array containing the intersection points.
 	 **/
 	// https://stackoverflow.com/questions/1073336/circle-line-segment-collision-detection-algorithm
 	public static function getIntersectionsSegCir(seg:Segment,circle:h2d.col.Circle):Array<Point> {

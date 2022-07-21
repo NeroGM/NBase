@@ -95,7 +95,6 @@ abstract MapArray<T>(Array<NamedData<T>>) {
 @:dox(hide)
 class MapArrayKIterator<T> {
     var nextIndex:Int = 0;
-	var aLength:Int = 0;
 	var ma:MapArray<T>;
 
 	public inline function new(ma:MapArray<T>) {
@@ -135,7 +134,6 @@ class MapArrayVIterator<T> {
 @:dox(hide)
 class MapArrayKVIterator<T> {
 	var nextIndex:Int = 0;
-	var aLength:Int = 0;
 	var ma:MapArray<T>;
 
 	public inline function new(ma:MapArray<T>) {

@@ -433,7 +433,6 @@ class Map extends Object {
     /** Creates an `nb.Map` instance. **/
 	public function new(x:Float=0, y:Float=0, ?parent:nb.Object) {
         super(x,y,parent);
-
     }
 
     /** 
