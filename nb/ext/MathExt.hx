@@ -42,22 +42,25 @@ class MathExt {
     }
 
     /**
-     * Returns a point on a 2D shape in a given direction.
+     * Returns the farthest points in a given direction.
      * 
      * @param math A `Math` class.
-     * @param points An array of `h2d.col.Point` defining a shape.
+     * @param points An array of `h2d.col.Point`.
      * @param direction Defines a direction where (1,0) is right and (0,1) is down.
+     * @return An array of `h2d.col.Point`. Only the points that are the farthest are returned,
+     * NOT all the points from the farthest to the closest.
      **/
-    public static function getSupportPoint(math:Class<Math>, points:Array<Point>, direction:Point):Point {
+    public static function getFarthestPoints(math:Class<Math>, points:Array<Point>, direction:Point):Array<Point> {
 		var highest:Float = Math.NEGATIVE_INFINITY;
-		var result:Point = null;
+		var res:Array<Point> = [];
 		for (p in points) {
+            var p = p.clone();
 			var v = p.dot(direction);
 			if (v > highest) {
 				highest = v;
-				result = p.clone();
-			}
+				res = [p];
+			} if (v == highest) res.push(p);
 		}
-		return result;
+		return res;
 	}
 }
