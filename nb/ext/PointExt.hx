@@ -62,7 +62,7 @@ class PointExt {
      * @return `true` if there is an equality, `false` otherwise.
      **/
     public static inline function equalEps(p1:Point, p2:Point, epsilon:Float=0.00000000001):Bool {
-        return (FloatExt.equals(p1.x,p2.x) && FloatExt.equals(p1.y,p2.y));
+        return (FloatExt.equals(p1.x,p2.x,epsilon) && FloatExt.equals(p1.y,p2.y,epsilon));
     }
 
     /**
