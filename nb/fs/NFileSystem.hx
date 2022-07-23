@@ -586,14 +586,14 @@ class NFileSystem implements FileSystem {
 				var path = rootPath+resPath+file.relPath;
 				var currMTime:Float = 0;
 				try currMTime = Std.int(FS.stat(path).mtime.getTime() / 1000)
-				catch (e) { trace("Couldn't stat '"+path+"', removed from watch."); toRemove.push(file); }
+				catch (e) { trace("Couldn't stat '"+path+"', removed from watch."); toRemove.push(file); continue; }
 
 				if (file.mTime < currMTime) {
 					nChecking++;
 					var freeA = freeSection(file.relPath);
 					var newBytes:Bytes = null;
-					try File.getBytes(path)
-					catch (e) { trace("Couldn't get bytes at '"+path+"', removed from watch."); toRemove.push(file); }
+					try newBytes = File.getBytes(path)
+					catch (e) { trace("Couldn't get bytes at '"+path+"', removed from watch."); toRemove.push(file); continue; }
 					sectionInsert(file.relPath, newBytes, (info) -> {
 						var oTime = file.mTime;
 						file.mTime = currMTime;
