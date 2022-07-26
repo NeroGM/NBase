@@ -197,9 +197,9 @@ typedef TiledText = {
 
 typedef TiledTileset = {
     /** Hex-formatted color (`"#RRGGBB"` or `"#AARRGGBB"`) (optional) **/
-    var backgroundcolor:String;
+    var ?backgroundcolor:String;
     /** The class of the tileset (since 1.9, optional) **/
-    var _class:String;
+    var ?_class:String;
     /** The number of tile columns in the tileset **/
     var columns:Int;
     /**
@@ -210,13 +210,13 @@ typedef TiledTileset = {
     /** GID corresponding to the first tile in the set **/
     var firstgid:Int;
     /** (optional) **/
-    var grid:TiledGrid;
+    var ?grid:TiledGrid;
     /** Image used for tiles in this set **/
-    var image:String;
+    var ?image:String;
     /** Height of source image in pixels **/
-    var imageheight:Int;
+    var ?imageheight:Int;
     /** Width of source image in pixels **/
-    var imagewidth:Int;
+    var ?imagewidth:Int;
     /** Buffer between image edge and first tile (pixels) **/
     var margin:Int;
     /** Name given to this tileset **/
@@ -227,13 +227,13 @@ typedef TiledTileset = {
      **/
     var objectalignment:String;
     /** Array of `TiledProperty` **/
-    var properties:Array<TiledProperty>;
+    var ?properties:Array<TiledProperty>;
     /** The external file that contains this tilesets data **/
     var source:String;
     /** Spacing between adjacent tiles in image (pixels) **/
     var spacing:Int;
     /** Array of `TiledTerrain` (optional) **/
-    var terrains:Array<TiledTerrain>;
+    var ?terrains:Array<TiledTerrain>;
     /** The number of tiles in this tileset **/
     var tilecount:Int;
     /** The Tiled version used to save the file **/
@@ -241,26 +241,26 @@ typedef TiledTileset = {
     /** Maximum height of tiles in this set **/
     var tileheight:Int;
     /** (optional) **/
-    var tileoffset:TiledTileOffset;
+    var ?tileoffset:TiledTileOffset;
     /**
      * The size to use when rendering tiles from this tileset on a
      * tile layer (`"tile"` (default) or `"grid"`) (since 1.9)
      **/
     var tilerendersize:String;
     /** Array of `TiledTile` (optional) **/
-    var tiles:Array<TiledTile>;
+    var ?tiles:Array<TiledTile>;
     /** Maximum width of tiles in this set **/
     var tilewidth:Int;
     /** Allowed transformations (optional) **/
-    var transformations:TiledTransformations;
+    var ?transformations:TiledTransformations;
     /** Hex-formatted color (`"#RRGGBB"`) (optional) **/
-    var transparentcolor:String;
+    var ?transparentcolor:String;
     /** `"tileset"` (for tileset files, since 1.0) **/
     var type:String;
     /** The JSON format version (previously a number, saved as string since 1.6) **/
     var version:String;
     /** Array of `TiledWangSet`s (since 1.1.5) **/
-    var wangsets:Array<TiledWangSet>;
+    var ?wangsets:Array<TiledWangSet>;
 }
 
 typedef TiledGrid = {
