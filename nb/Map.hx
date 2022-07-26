@@ -443,10 +443,11 @@ class Map extends Object {
      * Loads a Tiled map from a json resource.
      *
      * @param resource The json resource to load the Tiled map from.
+     * @param layersToLoad The names of the layers to load. If `null`, loads all layers.
      * @param singleTileGroup If `true` a single instance will contains all the tiles, otherwise,
      * an instance of `h2d.TileGroup` will be made for each `TiledLayer` with `type` set to `"tilelayer"`. 
      **/
-    public function loadTiledMap(resource:hxd.res.Resource, singleTileGroup:Bool=true) {
+    public function loadTiledMap(resource:hxd.res.Resource, ?layersToLoad:Array<String>, singleTileGroup:Bool=true) {
 		tiledMap = haxe.Json.parse(resource.entry.getText());
         var jsonDir = resource.entry.directory+"/";
         var tilesets:Array<TiledTileset> = [for (tileset in tiledMap.tilesets) {
@@ -512,7 +513,7 @@ class Map extends Object {
             addChild(tg);
         }
         
-        for (layer in tiledMap.layers) {
+        for (layer in tiledMap.layers) if (layersToLoad != null && layersToLoad.contains(layer.name)) {
             switch (layer.type) {
                 case "tilelayer":
                     if (layer.data is Array == false) throw "Layer data isn't an Array.";
