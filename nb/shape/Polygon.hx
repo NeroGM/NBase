@@ -34,7 +34,7 @@ class Polygon extends Shape {
         updateFields();
     }
 
-    /** The string representation of this instance. **/
+    /** Returns a string representation of this instance. **/
     override public function toString():String {
         return "Polygon: "+Std.string(points);
     }

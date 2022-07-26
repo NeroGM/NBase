@@ -58,6 +58,11 @@ class Circle extends Shape {
      **/
     public function asPolygon(nSegments:Int=0):Polygon return Polygon.makeCircle(col.x,col.y,radius,nSegments);
 
+    /** Returns a string representation of this instance. **/
+    override public function toString():String {
+        return "Circle: {x:"+col.x+",y:"+col.y+",r:"+col.ray+"}";
+    }
+
     private function get_radius():Float return col.ray;
 
     private function set_radius(v:Float) {

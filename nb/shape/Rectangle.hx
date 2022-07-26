@@ -19,4 +19,9 @@ class Rectangle extends Polygon {
         super([new Point(x,y), new Point(x+w,y), new Point(x+w,y+h), new Point(x,y+h)],parent);
         defs.push(RECTANGLE);
     }
+
+    /** Returns a string representation of this instance. **/
+    override public function toString():String {
+        return "Rectangle: "+Std.string(points);
+    }
 }
