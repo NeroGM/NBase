@@ -71,13 +71,13 @@ class Sprite extends Object {
     /**
      * The tiles associated with this sprite.
      * 
-     * Example: `tiles[1][3]` returns the tile used for displaying the 3rd layer of the 1st frame.
+     * Example: `tiles[1][3]` returns the tile used for displaying the 4th layer of the 2nd frame.
      **/
     public var tiles(default,null):Array<Array<h2d.Tile>> = [];
     /**
      * The `h2d.SpriteBatch.BatchElement` associated with this sprite.
      * 
-     * Example: `elements[2][1]` returns the element used for displaying the 1st layer of the 2nd frame.
+     * Example: `elements[2][1]` returns the element used for displaying the 2nd layer of the 3rd frame.
      **/
     public var elements(default,null):Array<Array<h2d.SpriteBatch.BatchElement>> = [];
     /** The `nb.Atlas` associated with this sprite. **/
