@@ -513,7 +513,7 @@ class Map extends Object {
             addChild(tg);
         }
         
-        for (layer in tiledMap.layers) if (layersToLoad != null && layersToLoad.contains(layer.name)) {
+        for (layer in tiledMap.layers) if (layersToLoad == null || layersToLoad.contains(layer.name)) {
             switch (layer.type) {
                 case "tilelayer":
                     if (layer.data is Array == false) throw "Layer data isn't an Array.";
