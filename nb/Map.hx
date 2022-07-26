@@ -449,6 +449,14 @@ class Map extends Object {
      **/
     public function loadTiledMap(resource:hxd.res.Resource, ?layersToLoad:Array<String>, singleTileGroup:Bool=true) {
 		tiledMap = haxe.Json.parse(resource.entry.getText());
+
+        inline function getAndDeleteClass(o:Dynamic):String {
+            var v:String = Reflect.field(o,"class");
+            Reflect.deleteField(o,"class");
+            return v;
+        }
+
+        tiledMap._class = getAndDeleteClass(tiledMap);
         var jsonDir = resource.entry.directory+"/";
         var tilesets:Array<TiledTileset> = [for (tileset in tiledMap.tilesets) {
             if (tileset.source != null) {
@@ -496,9 +504,25 @@ class Map extends Object {
                 else throw "Unknown tileset source format: '"+path+"'.";
                 ts.firstgid = tileset.firstgid;
                 ts.resPath = path;
+
+                ts._class = getAndDeleteClass(ts);
+                if (ts.tiles != null) for (tile in ts.tiles) tile._class = getAndDeleteClass(tile);
+                if (ts.wangsets != null) for (ws in ts.wangsets) {
+                    ws._class = getAndDeleteClass(ws);
+                    if (ws.colors != null) for (c in ws.colors) c._class = getAndDeleteClass(c);
+                }
+
                 tileset = ts;
             } else tileset;
         }];
+
+        for (layer in tiledMap.layers) {
+            layer._class = getAndDeleteClass(layer);
+            switch (layer.type) {
+                case "objectgroup": for (o in layer.objects) o._class = getAndDeleteClass(o);
+            }
+            
+        }
 
         atlas = new Atlas();
         for (tileset in tilesets) if (tileset.image != null)
