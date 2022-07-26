@@ -1,5 +1,7 @@
 package nb;
 
+import haxe.io.Path;
+
 typedef TiledMap = {
     /** Hex-formatted color (`"#RRGGBB"` or `"#AARRGGBB"`) (optional) **/
     var backgroundcolor:String;
@@ -446,18 +448,60 @@ class Map extends Object {
      **/
     public function loadTiledMap(resource:hxd.res.Resource, singleTileGroup:Bool=true) {
 		tiledMap = haxe.Json.parse(resource.entry.getText());
-        var directory = resource.entry.directory+"/";
+        var jsonDir = resource.entry.directory+"/";
         var tilesets:Array<TiledTileset> = [for (tileset in tiledMap.tilesets) {
             if (tileset.source != null) {
                 if (tileset.source.charAt(0) == ":") continue;
-                var ts:TiledTileset = haxe.Json.parse(hxd.Res.load(directory+tileset.source).entry.getText());
+                var path = Path.join([jsonDir,tileset.source]);
+                var extension = Path.extension(path);
+                var ts:TiledTileset = null;
+                if (extension == "tsx") {
+                    var xml = Xml.parse(hxd.Res.load(path).entry.getText());
+                    inline function get(elem:Xml, attr:String, def:String):String {
+                        var v = elem.get(attr);
+                        return v == null ? def : v;
+                    }
+                    inline function getInt(elem:Xml, attr:String, def:Int):Int {
+                        var v:Null<Int> = Std.parseInt(elem.get(attr));
+                        return v == null ? def : v;
+                    }
+                    for (elem in xml.elements()) if (elem.nodeName == "tileset") {
+                        ts = {
+                            columns: Std.parseInt(elem.get("columns")),
+                            fillmode: get(elem,"fillmode","stretch"),
+                            firstgid: tileset.firstgid,
+                            margin: getInt(elem,"margin",0),
+                            name: elem.get("name"),
+                            objectalignment: get(elem,"objectaligment","unspecified"),
+                            source: tileset.source,
+                            spacing: getInt(elem,"spacing",0),
+                            tilecount: Std.parseInt(elem.get("tilecount")),
+                            tiledversion: elem.get("tiledversion"),
+                            tileheight: Std.parseInt(elem.get("tileheight")),
+                            tilerendersize: get(elem,"tilerendersize","tile"),
+                            tilewidth: Std.parseInt(elem.get("tilewidth")),
+                            type: elem.get("tileset"),
+                            version: elem.get("version")
+                        }
+                        for (elem2 in elem.elements()) if (elem2.nodeName == "image") {
+                            ts.image = elem2.get("source");
+                            ts.imagewidth = Std.parseInt(elem2.get("imagewidth"));
+                            ts.imageheight = Std.parseInt(elem2.get("imageheight"));
+                            break;
+                        }
+                        break;
+                    }
+                } else if (extension == ".json") ts = haxe.Json.parse(hxd.Res.load(path).entry.getText());
+                else throw "Unknown tileset source format: '"+path+"'.";
                 ts.firstgid = tileset.firstgid;
-                ts;
+                ts.resPath = path;
+                tileset = ts;
             } else tileset;
         }];
 
         atlas = new Atlas();
-        for (tileset in tilesets) atlas.addImage(hxd.Res.load(directory+tileset.image).toImage(),tileset.name,RGBA);
+        for (tileset in tilesets) if (tileset.image != null)
+            atlas.addImage(hxd.Res.load(Path.join([Path.directory(tileset.resPath),tileset.image])).toImage(),tileset.name,RGBA);
         atlas.make();
         atlasTile = atlas.toTile();
 
