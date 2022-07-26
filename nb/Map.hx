@@ -261,6 +261,8 @@ typedef TiledTileset = {
     var version:String;
     /** Array of `TiledWangSet`s (since 1.1.5) **/
     var ?wangsets:Array<TiledWangSet>;
+    
+    var ?resPath:String;
 }
 
 typedef TiledGrid = {
