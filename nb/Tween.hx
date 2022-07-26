@@ -79,11 +79,11 @@ class TweenVar {
     }
 
     /** Sets the current value to the destination value and ends the tweening process. **/
-    public function end() {
+    public function end(doOnStep:Bool=true) {
         t = 1;
         realT = tMax;
         v = to;
-        onStep(v,realT,t,this);
+        if (doOnStep) onStep(v,realT,t,this);
     }
 
     /** The function that is in charge of returning the t values. **/
