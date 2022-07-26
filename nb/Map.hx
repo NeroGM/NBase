@@ -433,7 +433,7 @@ class Map extends Object {
     public var atlasTile:h2d.Tile = null;
 
     /** Creates an `nb.Map` instance. **/
-	public function new(x:Float=0, y:Float=0, ?parent:nb.Object) {
+	public function new(x:Float=0, y:Float=0, ?parent:h2d.Object) {
         super(x,y,parent);
     }
 
