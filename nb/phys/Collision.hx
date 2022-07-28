@@ -288,4 +288,52 @@ class Collision {
 		// No intersection : FallShort || Past || CompletelyInside
 		return [];
 	}
+
+	public static var debugG:Graphics = null;
+	public static var debugG2:Graphics = null;
+	public static var iMax:Int = 1;
+	public static function checkDistance(pol1:Polygon, pol2:Polygon) {
+		var rel = pol1.getScene();
+		if (rel == null) rel = Manager.currentScene;
+
+		var a1 = [for (p in pol1.points) p.relativeTo(rel,pol1)];
+		var a2 = [for (p in pol2.points) p.relativeTo(rel,pol2)];
+		var minskDiff:Polygon = new Polygon(Polygon.getMinkowskiDiff(a1,a2));
+
+		var simplex:Array<Point> = [];
+		var currTarget:Point = minskDiff.points[0];
+		var nextTarget:Point = null;
+
+		debugG.clear();
+		debugG.resetParams();
+		debugG.drawPolygon(minskDiff.points);
+		debugG.drawCircle(0,0,2);
+		function draw() {
+			
+		}
+
+		inline function addPointToSimplex(vec:Point) {
+			simplex.push(minskDiff.getFarthestPoints(vec)[0]);
+		}
+
+		for (i in 0...iMax) {
+			debugG2.clear();
+			
+			addPointToSimplex(currTarget.multiply(-1));
+			debugG2.params.lineColor = 0x00FF00;
+			debugG2.drawCircle(currTarget.x,currTarget.y,3);
+
+			switch (simplex.length) {
+				case 1: nextTarget = simplex[0];
+				case 2: nextTarget = simplex[0].add(simplex[1]).multiply(0.5);
+				default:
+			}
+
+			debugG2.params.lineColor = 0xFF0000;
+			debugG2.drawCircle(nextTarget.x,nextTarget.y,3);
+			currTarget = nextTarget;
+			trace(simplex);
+		}
+		
+	}
 }
