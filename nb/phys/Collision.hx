@@ -290,6 +290,10 @@ class Collision {
 		return [];
 	}
 
+	/**
+	 * Returns the distance between two polygons if they don't intersects, otherwise
+	 * returns the minimum translation vector needed to separate them.
+	 **/
 	public static function checkDistance(pol1:Polygon, pol2:Polygon):Point {
 		var rel = pol1.getScene();
 		if (rel == null) rel = Manager.currentScene;
