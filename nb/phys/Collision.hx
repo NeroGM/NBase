@@ -353,17 +353,15 @@ class Collision {
 					}
 
 					// Remove point from simplex
+					inline function pCheck(p:Point):Bool {
+						if (!p.equals(newTarget)) {
+							for (v in simplex) if (v.equals(p)) { simplex.remove(v); break; }
+							return true;
+						} return false;
+					}
 					for (seg in segments) if (onSeg != seg) {
-						var a = seg.getA();
-						if (!a.equals(newTarget)) {
-							for (p in simplex) if (p.equals(a)) { simplex.remove(p); break; }
-							break;
-						}
-						var b = seg.getB();
-						if (!b.equals(newTarget)) {
-							for (p in simplex) if (p.equals(b)) { simplex.remove(p); break; }
-							break;
-						}
+						if (pCheck(seg.getA())) break;
+						if (pCheck(seg.getB())) break;
 					}
 				default:
 			}
