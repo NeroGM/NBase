@@ -310,22 +310,21 @@ class Collision {
 		debugG.drawPolygon(minskDiff.points);
 		debugG.drawCircle(0,0,2);
 
-		var oValue:Point = null;
 		var newValue:Point = null;
 		function isConverging():Bool {
-			if (oValue == null) return false;
-			var posDiff = new Point(Math.abs(oValue.x-newValue.x),Math.abs(oValue.y-newValue.y));
-			var oAngle = Math.atan2(oValue.y,oValue.x);
-			var newAngle = Math.atan2(newValue.y,newValue.x);
-			var angleDiff = Math.abs(oAngle - newAngle);
-			if (posDiff.x+posDiff.y+angleDiff <= 0.0001) return true;
+			for (p in simplex) if (p != newValue) {
+				var posDiff = new Point(Math.abs(p.x-newValue.x),Math.abs(p.y-newValue.y));
+				var oAngle = Math.atan2(p.y,p.x);
+				var newAngle = Math.atan2(newValue.y,newValue.x);
+				var angleDiff = Math.abs(oAngle - newAngle);
+				if (posDiff.x+posDiff.y+angleDiff <= 0.0001) return true;
+			}
 			return false;
 		}
 
 		function addPointToSimplex(vec:Point):Point {
-			oValue = newValue;
 			var p = minskDiff.getFarthestPoints(vec)[0];
-			newValue = p.clone();
+			newValue = p;
 			simplex.push(p);
 			return p;
 		}
