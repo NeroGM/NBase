@@ -300,40 +300,88 @@ class Collision {
 		var a2 = [for (p in pol2.points) p.relativeTo(rel,pol2)];
 		var minskDiff:Polygon = new Polygon(Polygon.getMinkowskiDiff(a1,a2));
 
-		var simplex:Array<Point> = [];
-		var currTarget:Point = minskDiff.points[0];
-		var nextTarget:Point = null;
+		var oldTarget:Point = null;
+		var newTarget:Point = null;
+		var simplex:h2d.col.Polygon = [];
+		var origin:Point = new Point();
 
 		debugG.clear();
 		debugG.resetParams();
 		debugG.drawPolygon(minskDiff.points);
 		debugG.drawCircle(0,0,2);
-		function draw() {
-			
+
+		var oValue:Point = null;
+		var newValue:Point = null;
+		function isConverging():Bool {
+			if (oValue == null) return false;
+			var posDiff = new Point(Math.abs(oValue.x-newValue.x),Math.abs(oValue.y-newValue.y));
+			var oAngle = Math.atan2(oValue.y,oValue.x);
+			var newAngle = Math.atan2(newValue.y,newValue.x);
+			var angleDiff = Math.abs(oAngle - newAngle);
+			if (posDiff.x+posDiff.y+angleDiff <= 0.0001) return true;
+			return false;
 		}
 
-		inline function addPointToSimplex(vec:Point) {
-			simplex.push(minskDiff.getFarthestPoints(vec)[0]);
+		function addPointToSimplex(vec:Point):Point {
+			oValue = newValue;
+			var p = minskDiff.getFarthestPoints(vec)[0];
+			newValue = p.clone();
+			simplex.push(p);
+			return p;
 		}
 
 		for (i in 0...iMax) {
 			debugG2.clear();
+			oldTarget = newTarget;
 			
-			addPointToSimplex(currTarget.multiply(-1));
-			debugG2.params.lineColor = 0x00FF00;
-			debugG2.drawCircle(currTarget.x,currTarget.y,3);
-
 			switch (simplex.length) {
-				case 1: nextTarget = simplex[0];
-				case 2: nextTarget = simplex[0].add(simplex[1]).multiply(0.5);
+				case 0: newTarget = minskDiff.points[0];
+				case 1: newTarget = simplex[0];
+				case 2: newTarget = simplex.toSegments()[0].project(origin);
+				case 3:
+					var segments = simplex.toSegments();
+					var smallestDist:Float = Math.POSITIVE_INFINITY;
+					var onSeg:Segment = null;
+					newTarget = null;
+					for (seg in segments) {
+						var v = seg.project(origin);
+						var dist = v.distance(origin);
+						if (newTarget == null || dist < smallestDist) {
+							smallestDist = dist;
+							newTarget = v;
+							onSeg = seg;
+						}
+					}
+
+					// Remove point from simplex
+					for (seg in segments) if (onSeg != seg) {
+						var a = seg.getA();
+						if (!a.equals(newTarget)) {
+							for (p in simplex) if (p.equals(a)) { simplex.remove(p); break; }
+							break;
+						}
+						var b = seg.getB();
+						if (!b.equals(newTarget)) {
+							for (p in simplex) if (p.equals(b)) { simplex.remove(p); break; }
+							break;
+						}
+					}
 				default:
 			}
 
+			var justAdded = addPointToSimplex(newTarget.multiply(-1));
+			// trace(simplex);
+
 			debugG2.params.lineColor = 0xFF0000;
-			debugG2.drawCircle(nextTarget.x,nextTarget.y,3);
-			currTarget = nextTarget;
-			trace(simplex);
+			if (oldTarget != null) debugG2.drawCircle(oldTarget.x,oldTarget.y,3);
+			debugG2.params.lineColor = 0x00FF00;
+			debugG2.drawCircle(newTarget.x,newTarget.y,3);
+
+			if (isConverging()) break;
+
+			debugG2.params.lineColor = 0x0000FF;
+			debugG2.drawCircle(justAdded.x,justAdded.y,3);
 		}
-		
+		trace(newTarget);
 	}
 }
