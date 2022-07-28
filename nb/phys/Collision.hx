@@ -3,6 +3,7 @@ package nb.phys;
 using nb.ext.FloatExt;
 using nb.ext.PointExt;
 using nb.ext.SegmentExt;
+using nb.ext.ArrayExt;
 import nb.shape.*;
 
 /**
@@ -299,12 +300,13 @@ class Collision {
 		var a1 = [for (p in pol1.points) p.relativeTo(rel,pol1)];
 		var a2 = [for (p in pol2.points) p.relativeTo(rel,pol2)];
 		var minskDiff:Polygon = new Polygon(Polygon.getMinkowskiDiff(a1,a2));
-		var mDiffConvHull = minskDiff.points.convexHull();
+		var mDiffConvHull:h2d.col.Polygon = minskDiff.points.convexHull();
 
 		var oldTarget:Point = null;
 		var newTarget:Point = null;
 		var simplex:h2d.col.Polygon = [];
 		var origin:Point = new Point();
+		var intersectCheck:Bool = mDiffConvHull.contains(origin);
 
 		debugG.clear();
 		debugG.resetParams();
@@ -337,21 +339,84 @@ class Collision {
 			switch (simplex.length) {
 				case 0: newTarget = minskDiff.points[0];
 				case 1: newTarget = simplex[0];
-				case 2: newTarget = simplex.toSegments()[0].project(origin);
+				case 2:
+					newTarget = simplex.toSegments()[0].project(origin);
+					if (intersectCheck && newTarget.equals(origin)) {
+						var arr = simplex.points.copy();
+						arr.quickSort((a,b) -> a.distance(origin) < b.distance(origin));
+						trace("EPA: "+ arr[0]);
+						return;
+					}
 				case 3:
 					var segments = simplex.toSegments();
-					var smallestDist:Float = Math.POSITIVE_INFINITY;
+
 					var onSeg:Segment = null;
-					newTarget = null;
-					for (seg in segments) {
-						var v = seg.project(origin);
-						var dist = v.distance(origin);
-						if (newTarget == null || dist < smallestDist) {
-							smallestDist = dist;
-							newTarget = v;
-							onSeg = seg;
+					function getClosestProjection():Point {
+						var smallestDist:Float = Math.POSITIVE_INFINITY;
+						var p:Point = null;
+						for (seg in segments) {
+							var v = seg.project(origin);
+							var dist = v.distance(origin);
+							if (p == null || dist < smallestDist) {
+								smallestDist = dist;
+								p = v;
+								onSeg = seg;
+							}
 						}
+						return p;
 					}
+
+					// Check if polygons intersects
+					if (simplex.contains(origin)) {
+						// EPA
+						var oValue:Point = null;
+						var newValue:Point = null;
+						for (i in 0...iMax-3) {
+							debugG.clear();
+							debugG.resetParams();
+							debugG.drawPolygon(mDiffConvHull);
+							debugG.drawCircle(0,0,2);
+
+							oValue = newValue;
+							var p = getClosestProjection();
+							var v = addPointToSimplex(p);
+
+							for (i in 0...segments.length) if (segments[i] == onSeg) {
+								var seg = segments[i];
+
+								var a = seg.getA();
+								var b = seg.getB();
+								if (a.equals(v) || b.equals(v)) {
+									trace("EPA: "+ p);
+									return;
+								}
+
+								var newSeg1 = new Segment(seg.getA(),v);
+								var newSeg2 = new Segment(v,seg.getB());
+								segments[i] = newSeg1;
+								segments.segments.insert(i+1,newSeg2);
+								break;
+							}
+
+							debugG.params.lineColor = 0x00FF00;
+							for (seg in segments) {
+								var b = seg.getB();
+								debugG.drawLine(seg.x,seg.y,b.x,b.y);
+							}
+
+							newValue = p;
+							debugG.drawCircle(p.x,p.y,3);
+							var s:String = ""; for (seg in segments) s += seg.getA()+","+seg.getB()+"; ";
+							trace("EPA: "+s +"  - " + p);
+							if (oValue != null && newValue.equalEps(oValue)) {
+								trace("EPA: "+ newValue);
+								return;
+							}
+						}
+						return;
+					}
+
+					newTarget = getClosestProjection();
 
 					// Remove point from simplex
 					inline function pCheck(p:Point):Bool {
@@ -368,7 +433,7 @@ class Collision {
 			}
 
 			var justAdded = addPointToSimplex(newTarget.multiply(-1));
-			// trace(simplex);
+			trace(simplex);
 
 			debugG2.params.lineColor = 0xFF0000;
 			if (oldTarget != null) debugG2.drawCircle(oldTarget.x,oldTarget.y,3);
