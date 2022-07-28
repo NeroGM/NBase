@@ -299,6 +299,7 @@ class Collision {
 		var a1 = [for (p in pol1.points) p.relativeTo(rel,pol1)];
 		var a2 = [for (p in pol2.points) p.relativeTo(rel,pol2)];
 		var minskDiff:Polygon = new Polygon(Polygon.getMinkowskiDiff(a1,a2));
+		var mDiffConvHull = minskDiff.points.convexHull();
 
 		var oldTarget:Point = null;
 		var newTarget:Point = null;
@@ -307,7 +308,7 @@ class Collision {
 
 		debugG.clear();
 		debugG.resetParams();
-		debugG.drawPolygon(minskDiff.points);
+		debugG.drawPolygon(mDiffConvHull);
 		debugG.drawCircle(0,0,2);
 
 		var newValue:Point = null;
