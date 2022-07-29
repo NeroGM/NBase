@@ -360,6 +360,7 @@ class Collision {
 			return newValue;
 		}
 
+		var justRemovedP:Point = null;
 		var forceEPA:Bool = false;
 		for (i in 0...iMax) {			
 			switch (simplex.length) {
@@ -447,12 +448,17 @@ class Collision {
 					newTarget = getClosestProjection();
 					if (newTarget.equalEps(origin)) return newTarget; // Fix for when newTarget == origin
 
-					// Removes point from simplex
-					inline function pCheck(p:Point):Bool {
+					// Remove point from simplex
+					function pCheck(p:Point):Bool {
 						if (!p.equals(newTarget)) {
-							for (v in simplex) if (v.equals(p)) { simplex.remove(v); break; }
-							return true;
-						} return false;
+							for (v in simplex) if (v.equals(p)) {
+								simplex.remove(v);
+								justRemovedP = v;
+								return true;
+							}
+							throw "Shouldn't happen.";
+						}
+						return false;
 					}
 					for (seg in segments) if (onSeg != seg) {
 						if (pCheck(seg.getA())) break;
@@ -471,14 +477,15 @@ class Collision {
 			debugG2.params.lineColor = 0x00FF00;
 			debugG2.drawCircle(newTarget.x,newTarget.y,3);
 
-			if (isConverging()) {
-				trace(newTarget);
+			if (isConverging() || (justRemovedP != null && justAdded.equalEps(justRemovedP))) {
+				trace(newTarget + "  " + (justRemovedP != null && justAdded.equalEps(justRemovedP)));
 				return newTarget;
 			}
 
 			debugG2.params.lineColor = 0x0000FF;
 			debugG2.drawCircle(justAdded.x,justAdded.y,3);
 			oldTarget = newTarget;
+			justRemovedP = null;
 		}
 		trace(newTarget);
 		trace("max");
