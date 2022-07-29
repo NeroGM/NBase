@@ -333,6 +333,7 @@ class Collision {
 			return newValue;
 		}
 
+		var forceEPA:Bool = false;
 		for (i in 0...1000) {			
 			switch (simplex.length) {
 				case 0: newTarget = minskDiff.points[0];
@@ -341,10 +342,9 @@ class Collision {
 					newTarget = simplex.toSegments()[0].project(origin);
 
 					var mDiffConvHull:h2d.col.Polygon = minskDiff.points.convexHull();
-					if (mDiffConvHull.contains(origin) && newTarget.equals(origin)) {
-						var arr = simplex.points.copy();
-						arr.quickSort((a,b) -> a.distance(origin) < b.distance(origin));
-						return arr[0];
+					if (mDiffConvHull.contains(origin) && newTarget.equalEps(origin)) { // Fix for when newTarget == origin
+						newTarget = mDiffConvHull.toSegments()[0].project(origin);
+						forceEPA = true; 
 					}
 				case 3:
 					var segments = simplex.toSegments();
@@ -365,7 +365,7 @@ class Collision {
 					}
 
 					// EPA if true
-					if (simplex.contains(origin)) {
+					if (simplex.contains(origin) || forceEPA) {
 						var oValue:Point = null;
 						for (i in 0...1000) {
 							var p = getClosestProjection();
@@ -393,6 +393,7 @@ class Collision {
 
 					// Else continue GJK
 					newTarget = getClosestProjection();
+					if (newTarget.equalEps(origin)) return newTarget; // Fix for when newTarget == origin
 
 					// Removes point from simplex
 					inline function pCheck(p:Point):Bool {
