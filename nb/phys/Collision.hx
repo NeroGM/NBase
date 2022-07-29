@@ -296,7 +296,8 @@ class Collision {
 	 **/
 	public static function checkDistance(pol1:Polygon, pol2:Polygon):Point {
 		var rel = pol1.getScene();
-		if (rel == null) rel = Manager.currentScene;
+		if (rel == null) { trace("checkDistance: pol1 doesn't have a scene."); return new Point(); }
+		else if (rel != pol2.getScene()) { trace("checkDistance: pol2 isn't in the same scene as pol1."); return new Point(); }
 
 		var a1 = [for (p in pol1.points) p.relativeTo(rel,pol1)];
 		var a2 = [for (p in pol2.points) p.relativeTo(rel,pol2)];
