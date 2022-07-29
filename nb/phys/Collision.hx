@@ -12,6 +12,20 @@ import nb.shape.*;
  * @since 0.1.0
  **/
 class Collision {
+
+	public static function checkAABB(shape1:Shape, shape2:Shape):Bool {
+		var min1 = shape1.localToGlobal();
+		var min2 = shape2.localToGlobal();
+		var max1 = shape1.localToGlobal(new Point(shape1.size.w,shape1.size.h));
+		var max2 = shape2.localToGlobal(new Point(shape2.size.w,shape2.size.h));
+		var d1x = min2.x - max1.x;
+		var d1y = min2.y - max1.y;
+		var d2x = min1.x - max2.x;
+		var d2y = min1.y - max2.y;
+		if (d1x > 0 || d1y > 0 || d2x > 0 || d2y > 0) return false;
+		return true;
+	}
+
 	/**
 	 * Checks if two rays intersects, and where.
 	 *
