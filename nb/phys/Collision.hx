@@ -317,6 +317,9 @@ class Collision {
 	 * @return If they don't intersects, the minimum translation vector needed to separate `pol2` from
 	 * `pol1`. Otherwise, returns the minimum translation vector needed for `pol2` to collide with `pol1`.
 	 **/
+	public static var debugG:Graphics = null;
+	public static var debugG2:Graphics = null;
+	public static var iMax:Int = 1;
 	public static function checkDistance(pol1:Polygon, pol2:Polygon):Point {
 		var rel = pol1.getScene();
 		if (rel == null) { trace("checkDistance: pol1 doesn't have a scene."); return new Point(); }
@@ -328,9 +331,16 @@ class Collision {
 		var a2 = [for (p in pol2.points) p.relativeTo(rel,pol2)];
 		var minskDiff:Polygon = new Polygon(Polygon.getMinkowskiDiff(a1,a2));
 
+		var oldTarget:Point = null;
 		var newTarget:Point = null;
 		var simplex:h2d.col.Polygon = [];
 		var origin:Point = new Point();
+
+		debugG.clear();
+		debugG2.clear();
+		debugG.resetParams();
+		debugG.drawPolygon(minskDiff.points.convexHull());
+		debugG.drawCircle(0,0,2);
 
 		var newValue:Point = null;
 		function isConverging():Bool {
@@ -351,7 +361,7 @@ class Collision {
 		}
 
 		var forceEPA:Bool = false;
-		for (i in 0...1000) {			
+		for (i in 0...iMax) {			
 			switch (simplex.length) {
 				case 0: newTarget = minskDiff.points[0];
 				case 1: newTarget = simplex[0];
@@ -384,7 +394,14 @@ class Collision {
 					// EPA if true
 					if (simplex.contains(origin) || forceEPA) {
 						var oValue:Point = null;
-						for (i in 0...1000) {
+						for (i in 0...iMax-3) {
+							debugG.clear();
+							debugG.resetParams();
+							debugG.drawPolygon(minskDiff.points.convexHull());
+							debugG.drawCircle(0,0,2);
+
+							oValue = newValue;
+
 							var p = getClosestProjection();
 							var v = addPointToSimplex(p);
 
@@ -392,7 +409,10 @@ class Collision {
 								var seg = segments[i];
 								var a = seg.getA();
 								var b = seg.getB();
-								if (a.equals(v) || b.equals(v)) { return p; }
+								if (a.equals(v) || b.equals(v)) { 
+									trace("EPA:: "+ p);
+									return p;
+								}
 
 								var newSeg1 = new Segment(seg.getA(),v);
 								var newSeg2 = new Segment(v,seg.getB());
@@ -401,8 +421,23 @@ class Collision {
 								break;
 							}
 
-							if (oValue != null && p.equalEps(oValue)) return p;
-							else oValue = p;
+							debugG.params.lineColor = 0x00FF00;
+							for (seg in segments) {
+								var b = seg.getB();
+								debugG.drawLine(seg.x,seg.y,b.x,b.y);
+							}
+
+							newValue = p;
+							debugG.drawCircle(p.x,p.y,3);
+							var s:String = ""; for (seg in segments) s += seg.getA()+","+seg.getB()+"; ";
+							trace("EPA: "+s +"  - " + p);
+							if (oValue != null && newValue.equalEps(oValue)) {
+								trace("EPA: "+ newValue);
+								return p;
+							} else oValue = p;
+
+							// if (oValue != null && p.equalEps(oValue)) return p;
+							// else oValue = p;
 						}
 						throw "checkDistance: max EPA loop count reached.";
 						return null;
@@ -426,10 +461,28 @@ class Collision {
 				default: throw "Shouldn't happen.";
 			}
 
-			addPointToSimplex(newTarget.multiply(-1));
-			if (isConverging()) return newTarget;
+
+			var justAdded = addPointToSimplex(newTarget.multiply(-1));
+
+			debugG2.clear();
+			trace(simplex);
+			debugG2.params.lineColor = 0xFF0000;
+			if (oldTarget != null) debugG2.drawCircle(oldTarget.x,oldTarget.y,3);
+			debugG2.params.lineColor = 0x00FF00;
+			debugG2.drawCircle(newTarget.x,newTarget.y,3);
+
+			if (isConverging()) {
+				trace(newTarget);
+				return newTarget;
+			}
+
+			debugG2.params.lineColor = 0x0000FF;
+			debugG2.drawCircle(justAdded.x,justAdded.y,3);
+			oldTarget = newTarget;
 		}
-		throw "checkDistance: max GJK loop count reached.";
-		return null;
+		trace(newTarget);
+		trace("max");
+		// throw "checkDistance: max GJK loop count reached.";
+		return new Point(-222,-222);
 	}
 }
