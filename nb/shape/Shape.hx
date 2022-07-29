@@ -24,6 +24,7 @@ abstract class Shape extends Object {
     public var center:Point = new Point();
     /** An `nb.Graphics` instance used to draw debug visualizations. **/
     private var debugG:Graphics = null;
+    public var aabbBounds(default,null):Bounds = new Bounds();
 
     /**
      * Creates an `nb.shape.Shape` instance.

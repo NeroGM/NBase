@@ -136,6 +136,10 @@ class Polygon extends Shape {
         var botP = getFarthestPoints(new Point(0,1))[0];
         setSize(Math.abs(rightP.x-leftP.x),Math.abs(topP.y-botP.y));
         center.set(leftP.x+size.w/2,topP.y+size.h/2);
+
+        aabbBounds.empty();
+        aabbBounds.addPoint(new Point(leftP.x,topP.y));
+        aabbBounds.addPoint(new Point(leftP.x+size.w,topP.y+size.h));
     }
 
     /**

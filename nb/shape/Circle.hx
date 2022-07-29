@@ -65,6 +65,12 @@ class Circle extends Shape {
         center.set(col.x,col.y);
         centroid.set(col.x,col.y);
         setSize(radius*2,radius*2);
+
+        var leftP = getFarthestPoints(new Point(-1,0))[0];
+        var topP = getFarthestPoints(new Point(0,-1))[0];
+        aabbBounds.empty();
+        aabbBounds.addPoint(new Point(leftP.x,topP.y));
+        aabbBounds.addPoint(new Point(leftP.x+size.w,topP.y+size.h));
     }
 
     private function get_radius():Float return col.ray;
