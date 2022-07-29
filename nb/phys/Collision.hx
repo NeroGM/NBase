@@ -13,6 +13,7 @@ import nb.shape.*;
  **/
 class Collision {
 
+	/** Returns `true` if two shapes bounding boxes collides. **/
 	public static function checkAABB(shape1:Shape, shape2:Shape):Bool {
 		var min1 = shape1.localToGlobal();
 		var min2 = shape2.localToGlobal();
