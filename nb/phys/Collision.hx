@@ -350,6 +350,7 @@ class Collision {
 			return newValue;
 		}
 
+		var justRemovedP:Point = null;
 		var forceEPA:Bool = false;
 		for (i in 0...1000) {			
 			switch (simplex.length) {
@@ -412,12 +413,17 @@ class Collision {
 					newTarget = getClosestProjection();
 					if (newTarget.equalEps(origin)) return newTarget; // Fix for when newTarget == origin
 
-					// Removes point from simplex
-					inline function pCheck(p:Point):Bool {
+					// Remove point from simplex
+					function pCheck(p:Point):Bool {
 						if (!p.equals(newTarget)) {
-							for (v in simplex) if (v.equals(p)) { simplex.remove(v); break; }
-							return true;
-						} return false;
+							for (v in simplex) if (v.equals(p)) {
+								simplex.remove(v);
+								justRemovedP = v;
+								return true;
+							}
+							throw "Shouldn't happen.";
+						}
+						return false;
 					}
 					for (seg in segments) if (onSeg != seg) {
 						if (pCheck(seg.getA())) break;
@@ -426,8 +432,9 @@ class Collision {
 				default: throw "Shouldn't happen.";
 			}
 
-			addPointToSimplex(newTarget.multiply(-1));
-			if (isConverging()) return newTarget;
+			var justAdded = addPointToSimplex(newTarget.multiply(-1));
+			if (isConverging() || (justRemovedP != null && justAdded.equalEps(justRemovedP))) return newTarget;
+			justRemovedP = null;
 		}
 		throw "checkDistance: max GJK loop count reached.";
 		return null;
