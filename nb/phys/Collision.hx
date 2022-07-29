@@ -15,10 +15,12 @@ class Collision {
 
 	/** Returns `true` if two shapes bounding boxes collides. **/
 	public static function checkAABB(shape1:Shape, shape2:Shape):Bool {
-		var min1 = shape1.localToGlobal();
-		var min2 = shape2.localToGlobal();
-		var max1 = shape1.localToGlobal(new Point(shape1.size.w,shape1.size.h));
-		var max2 = shape2.localToGlobal(new Point(shape2.size.w,shape2.size.h));
+		var b1 = shape1.aabbBounds;
+		var b2 = shape2.aabbBounds;
+		var min1 = shape1.localToGlobal(b1.getMin());
+		var min2 = shape2.localToGlobal(b2.getMin());
+		var max1 = shape1.localToGlobal(b1.getMax());
+		var max2 = shape2.localToGlobal(b2.getMax());
 		var d1x = min2.x - max1.x;
 		var d1y = min2.y - max1.y;
 		var d2x = min1.x - max2.x;
