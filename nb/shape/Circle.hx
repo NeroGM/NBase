@@ -24,9 +24,7 @@ class Circle extends Shape {
         defs.push(CIRCLE);
 
         col = new h2d.col.Circle(cx,cy,radius);
-        center.set(cx,cy);
-        centroid.set(cx,cy);
-        setSize(radius*2,radius*2);
+        updateFields();
     }
 
     /** Returns in an array the farthest point in the direction defined by `vector`. **/
@@ -61,6 +59,12 @@ class Circle extends Shape {
     /** Returns a string representation of this instance. **/
     override public function toString():String {
         return "Circle: {x:"+col.x+",y:"+col.y+",r:"+col.ray+"}";
+    }
+
+    public function updateFields() {
+        center.set(col.x,col.y);
+        centroid.set(col.x,col.y);
+        setSize(radius*2,radius*2);
     }
 
     private function get_radius():Float return col.ray;
