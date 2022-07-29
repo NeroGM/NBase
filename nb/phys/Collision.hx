@@ -291,8 +291,14 @@ class Collision {
 	}
 
 	/**
-	 * Returns the distance between two polygons if they don't intersects, otherwise
-	 * returns the minimum translation vector needed to separate them.
+	 * Returns a minimum translation vector needed for two polygons to collide or separate.
+	 *
+	 * Make sure that the two polygons are in the same scene.
+	 *
+	 * @param pol1 The first polygon.
+	 * @param pol2 The second polygon.
+	 * @return If they don't intersects, the minimum translation vector needed to separate `pol2` from
+	 * `pol1`. Otherwise, returns the minimum translation vector needed for `pol2` to collide with `pol1`.
 	 **/
 	public static function checkDistance(pol1:Polygon, pol2:Polygon):Point {
 		var rel = pol1.getScene();
