@@ -326,7 +326,8 @@ class Collision {
 
 		var a1 = [for (p in pol1.points) p.relativeTo(rel,pol1)];
 		var a2 = [for (p in pol2.points) p.relativeTo(rel,pol2)];
-		var minskDiff:Polygon = new Polygon(Polygon.getMinkowskiDiff(a1,a2));
+		var diff:h2d.col.Polygon = Polygon.getMinkowskiDiff(a1,a2);
+		var minskDiff:Polygon = new Polygon(diff.convexHull());
 
 		var newTarget:Point = null;
 		var simplex:h2d.col.Polygon = [];
@@ -359,9 +360,8 @@ class Collision {
 				case 2:
 					newTarget = simplex.toSegments()[0].project(origin);
 
-					var mDiffConvHull:h2d.col.Polygon = minskDiff.points.convexHull();
-					if (mDiffConvHull.contains(origin) && newTarget.equalEps(origin)) { // Fix for when newTarget == origin
-						newTarget = mDiffConvHull.toSegments()[0].project(origin);
+					if (minskDiff.containsPoint(origin) && newTarget.equalEps(origin)) { // Fix for when newTarget == origin
+						newTarget = minskDiff.toSegments()[0].project(origin);
 						forceEPA = true; 
 					}
 				case 3:
