@@ -21,7 +21,8 @@ class Quad extends Rectangle {
     public var maxBucketSize:Int = 4;
 
     override private function new(x:Float, y:Float, w:Float, h:Float, quadTree:QuadTree, ?parentQuad:Quad) {
-        super(x,y,w,h,quadTree);
+        super(0,0,w,h,quadTree);
+        setPosition(x,y);
         this.quadTree = quadTree;
         this.parentQuad = parentQuad == null ? quadTree : parentQuad;
     }
