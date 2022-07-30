@@ -31,8 +31,11 @@ class Entity extends Object {
 
     public var collResMode:CollisionResolutionMode = DEFAULT;
 
+    public var debugG:nb.Graphics;
+
     public function new(obj:Object, ?type:EntityType) {
         super(0,0,obj);
+        debugG = new nb.Graphics(0,0,this);
         shapes = new Shapes(this);
 
         if (type != null) this.type = type;
@@ -84,5 +87,9 @@ class Entity extends Object {
         }        
 
         angVelocity += torque/moi;
+    }
+
+    public function debugDraw() {
+        shapes.debugDraw();
     }
 }
