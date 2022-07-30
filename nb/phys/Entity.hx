@@ -71,10 +71,11 @@ class Entity extends Object {
     }
 
     public function applyTorque(force:Point, at:Point) {
-        var torque:Float = at.cross(force);
-        var moi:Float = 0; // Moment of inertia
-
         var s = shapes.union[0];
+
+        var torque:Float = at.sub(s.centroid).cross(force);
+        var moi:Float = 0; // Moment of inertia
+        
         if (shapes.union.length == 1 && s is Rectangle)
             moi = (mass*(s.size.w*s.size.w+s.size.h*s.size.h)) / 12;
         else {
