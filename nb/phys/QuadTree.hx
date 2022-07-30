@@ -30,7 +30,5 @@ class Quad extends Rectangle {
 class QuadTree extends Quad {
     override public function new(x:Float, y:Float, w:Float, h:Float, ?parent:Object) {
         super(x,y,w,h,null);
-        var firstQuad:Quad = new Quad(x,y,w,h,this);
-        childQuads.push(firstQuad);
     }
 }
