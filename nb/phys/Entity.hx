@@ -61,7 +61,7 @@ class Entity extends Object {
     public function applyForce(force:Point, ?at:Point, drawDebug:Bool=true) {
         if (force.x == 0 && force.y == 0) return;
 
-        if (at == null) at = new Point();
+        if (at == null) at = shapes.centroid.clone();
         var at2 = at.clone();
         at2.rotate(obj.rotation);
         
