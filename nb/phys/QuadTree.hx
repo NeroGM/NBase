@@ -20,9 +20,10 @@ class Quad extends Rectangle {
     public var childQuads:Array<Quad> = [];
     public var maxBucketSize:Int = 4;
 
-    override public function new(x:Float, y:Float, w:Float, h:Float, quadTree:QuadTree) {
+    override private function new(x:Float, y:Float, w:Float, h:Float, quadTree:QuadTree, ?parentQuad:Quad) {
         super(x,y,w,h,quadTree);
         this.quadTree = quadTree;
+        this.parentQuad = parentQuad == null ? quadTree : parentQuad;
     }
 }
 
