@@ -179,7 +179,8 @@ class Shapes extends Shape {
         var segments:haxe.ds.Map<Polygon, Array<Segment>> = new haxe.ds.Map();
         var checkedSegs:Array<Array<Segment>> = [];
         
-        if (shapes.length < 2) return null;
+        if (shapes.length < 1) return [];
+        else if (shapes.length == 1) return [new Polygon(cast(shapes[0],Polygon).points)];
 
         // Make graph
         for (shape in shapes) if (shape is Polygon) {
