@@ -62,6 +62,8 @@ class Manager {
 
 	/** Whether this class should use traces. `true` by default if compiler flag `debug` is defined. **/
 	public static var logging:Bool = #if debug true #else false #end;
+
+	public static var spaces:Array<nb.phys.Space> = [];
 	
 	/** Initializes this class. It needs to be done once before being used and have `neroFS` set. **/
 	public static function init(app:hxd.App, ?w:Int=300, ?h:Int=300, onFinished:Void->Void) {

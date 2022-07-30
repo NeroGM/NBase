@@ -3,6 +3,8 @@ package nb.phys;
 using nb.ext.PointExt;
 using nb.ext.ArrayExt;
 import nb.shape.*;
+import nb.phys.*;
+import nb.phys.Space.State;
 
 enum EntityType {
     STATIC;
@@ -30,6 +32,10 @@ class Entity extends Object {
     public var forces:Array<Force> = [];
 
     public var collResMode:CollisionResolutionMode = DEFAULT;
+    public var spaces:Array<Space> = [];
+    public var spaceDatas:Array<nb.phys.Space.SpaceData> = [];
+    @:allow(nb.phys.Space)
+    public var t(default,null):Float = 0;
 
     public var debugG:nb.Graphics;
 
@@ -92,5 +98,19 @@ class Entity extends Object {
 
     public function debugDraw() {
         shapes.debugDraw();
+    }
+
+    public function getState():State {
+        var state:State = {
+            t:t,
+            pos:localToGlobal(),
+            rotation:rotation,
+            velocity:velocity.clone(),
+            acceleration:acceleration,
+            angVelocity:angVelocity,
+            forces:[for (f in forces) {value:f.value, at:f.at}]
+        };
+
+        return state;
     }
 }
