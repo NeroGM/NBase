@@ -103,12 +103,11 @@ class Quad extends Rectangle {
 
 @:allow(nb.phys.Quad)
 class QuadTree extends Quad {
-    private var nextQuadId:Int = 1;
+    private var nextQuadId:Int = 0;
     public var allElements:Map<Object,QTElement> = new Map();
 
     override public function new(x:Float, y:Float, w:Float, h:Float, ?parent:Object) {
         super(x,y,w,h,this,null);
-        quadId = 0;
     }
 
     public function addObject(o:Object) {
