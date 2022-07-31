@@ -3,6 +3,7 @@ package nb.phys;
 import nb.shape.*;
 import haxe.ds.Map;
 using nb.ext.PointExt;
+using nb.ext.ArrayExt;
 
 class QTElement {
     public var o:Object;
@@ -14,9 +15,23 @@ class QTElement {
         this.o = o;
         this.quadTree = quadTree;
     }
+
+    public function remove() {
+        var parentQuads:Set<Quad> = new Set();
+        for (i in 0...quads.length) {
+            var quad = quads.pop();
+            quad.elements.remove(this);
+            parentQuads.add(quad.parentQuad);
+        }
+        rect = null;
+        quadTree = null;
+
+        for (quad in parentQuads) quad.tryUniteChildren();
+    }
 }
 
 @:allow(nb.phys.QuadTree)
+@:allow(nb.phys.QTElement)
 class Quad extends Rectangle {
     public var quadId:Int = -1;
     public var elements:Array<QTElement> = [];
@@ -74,6 +89,22 @@ class Quad extends Rectangle {
         } else relQuad.addElement(elem,true);
     }
 
+    private function tryUniteChildren() {
+        for (cQuad in childQuads) if (cQuad.childQuads.length != 0) return false;
+
+        var s:Set<QTElement> = new Set();
+        for (e in elements) s.add(e);
+        for (cQuad in childQuads) for (e in cQuad.elements) s.add(e);
+        var arr = s.toArray();
+
+        if (arr.length > maxBucketSize) return false;
+
+        // Unite children
+        for (i in 0...childQuads.length) childQuads.last().dissolve();
+        for (e in arr) if (!elements.contains(e)) addElement(e);
+        return true;
+    }
+
     private function subdivide() {
         var p:Point = elements[0].rect.center.relativeTo(this,elements[0].rect);
         for (e in elements) p = p.add(e.rect.center.relativeTo(this,e.rect)).multiply(0.5);
@@ -97,6 +128,16 @@ class Quad extends Rectangle {
             cQuad.addElement(e);
         }
     }
+
+    private function dissolve() {
+        for (i in 0...elements.length) elements.pop().quads.remove(this);
+        for (i in 0...siblings.length) siblings.pop();
+        parentQuad.childQuads.remove(this);
+        parentQuad = null;
+        quadTree = null;
+        quadId = -1;
+        return;
+    }
 }
 
 @:allow(nb.phys.Quad)
@@ -113,5 +154,13 @@ class QuadTree extends Quad {
         allElements.set(o,e);
         var quad = getQuadAt(new Point(o.x,o.y));
         quad.addElement(e);
+    }
+
+    public function removeObject(o:Object):Bool {
+        var e = allElements[o];
+        if (e == null) return false;
+        e.remove();
+        allElements.remove(o);
+        return true;
     }
 }
