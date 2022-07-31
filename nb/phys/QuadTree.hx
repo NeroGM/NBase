@@ -64,8 +64,6 @@ class Quad extends Rectangle {
         var sQuads:Array<Quad> = [for (sQuad in siblings) if (Collision.checkAABB(oRect,sQuad)) sQuad];
 
         if (sQuads.length != 3) {
-            for (i in 0...elem.quads.length) elem.quads.pop();
-            
             elem.rect = oRect;
             elem.quads.push(this);
             elements.push(elem);
