@@ -1,6 +1,7 @@
 package nb.phys;
 
 import nb.shape.*;
+import haxe.ds.Map;
 using nb.ext.PointExt;
 
 class QTElement {
@@ -103,7 +104,7 @@ class Quad extends Rectangle {
 @:allow(nb.phys.Quad)
 class QuadTree extends Quad {
     private var nextQuadId:Int = 1;
-    public var allElements:Array<QTElement> = [];
+    public var allElements:Map<Object,QTElement> = new Map();
 
     override public function new(x:Float, y:Float, w:Float, h:Float, ?parent:Object) {
         super(x,y,w,h,this,null);
@@ -112,7 +113,7 @@ class QuadTree extends Quad {
 
     public function addObject(o:Object) {
         var e = new QTElement(o,this);
-        allElements.push(e);
+        allElements.set(o,e);
         var quad = getQuadAt(new Point(o.x,o.y));
         quad.addElement(e);
     }
