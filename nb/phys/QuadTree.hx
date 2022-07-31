@@ -110,7 +110,7 @@ class Quad extends Rectangle {
         for (e in elements) p = p.add(e.rect.center.relativeTo(this,e.rect)).multiply(0.5);
 
         for (e in elements) e.quads.remove(this);
-        var elementsCopy = [for (i in 0...elements.length) elements.pop()];
+        var elementsCopy = [for (i in 0...elements.length) elements.shift()];
 
         var v1 = size.w-p.x;
         var v2 = size.h-p.y;
