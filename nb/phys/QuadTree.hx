@@ -21,7 +21,7 @@ class QTElement {
         for (i in 0...quads.length) {
             var quad = quads.pop();
             quad.elements.remove(this);
-            parentQuads.add(quad.parentQuad);
+            parentQuads.add(quad == quadTree ? quadTree : quad.parentQuad);
         }
         rect = null;
         quadTree = null;
