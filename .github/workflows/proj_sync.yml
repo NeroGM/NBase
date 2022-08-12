@@ -76,7 +76,7 @@ jobs:
 
             $date1 = Get-Date $Env:contentCreatedAt
             $date2 = Get-Date $committedDate
-            if ($date1 -le $date2) { $Env:contentCreatedAt } else { $committedDate }
+            if ($date1 -le $date2) { $Env:contentCreatedAt } else { $date2.toString('yyyy/MM/dd') }
           } else {
             $Env:contentCreatedAt
           }
