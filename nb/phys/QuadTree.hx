@@ -55,8 +55,10 @@ class Quad extends Rectangle {
     public function getQuadAt(p:Point):Quad {
         if (childQuads.length == 0) return this;
 
-        for (quad in childQuads) if (quad.containsPoint(p))
-            return quad.getQuadAt(p);
+        for (quad in childQuads) {
+            var p = p.relativeTo(quad,this);
+            if (quad.containsPoint(p)) return quad.getQuadAt(p);
+        }
 
         throw "Shouldn't happen.";
         return null; // Shouldn't happen.
@@ -65,7 +67,7 @@ class Quad extends Rectangle {
     private function addElement(elem:QTElement, ignoreLimit:Bool=false) {
         if (!ignoreLimit && elements.length >= maxBucketSize) {
             subdivide();
-            var cQuad = getQuadAt(new Point(elem.o.x,elem.o.y));
+            var cQuad = getQuadAt(new Point(elem.o.x,elem.o.y).relativeTo(this,elem.o.parent));
             cQuad.addElement(elem);
             return;
         }
@@ -124,7 +126,7 @@ class Quad extends Rectangle {
         quad4.siblings = [quad1,quad2,quad3];
 
         for (e in elementsCopy) {
-            var cQuad = getQuadAt(new Point(e.o.x,e.o.y));
+            var cQuad = getQuadAt(new Point(e.o.x,e.o.y).relativeTo(this,e.o.parent));
             cQuad.addElement(e);
         }
     }
@@ -153,7 +155,7 @@ class QuadTree extends Quad {
     public function addObject(o:Object) {
         var e = new QTElement(o,this);
         allElements.set(o,e);
-        var quad = getQuadAt(new Point(o.x,o.y));
+        var quad = getQuadAt(new Point(o.x,o.y).relativeTo(this,o.parent));
         quad.addElement(e);
     }
 
