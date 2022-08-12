@@ -16,6 +16,8 @@ class Polygon extends Shape {
     /** Whether the right side of the segments of the polygon face inwards. **/
     public var rightSideFaceInside(default,null):Bool = false;
 
+    public var hideDebugDrawNormals:Bool = false;
+
     /**
      * Creates an `nb.shape.Polygon` instance.
      * 
@@ -64,7 +66,7 @@ class Polygon extends Shape {
         debugG.params.alpha = alpha;
 
         debugG.drawPolygon(points);
-        for (segment in points.toSegments()) {
+        if (!hideDebugDrawNormals) for (segment in points.toSegments()) {
             var dx = segment.dx;
             var dy = segment.dy;
             var normal:Point = rightSideFaceInside ? new Point(-dy,dx).normalized() : new Point(dy,-dx).normalized();
