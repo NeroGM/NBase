@@ -1,0 +1,134 @@
+on:
+  pull_request:
+    types: [opened,reopened,closed]
+  issues:
+    types: [opened,reopened,closed]
+  
+env:
+  PA_GH_TOKEN: ${{ secrets.PROJECT_ACCESS_PAT }}
+
+jobs:
+  nero-project-sync:
+    name: Updating Nero's Project
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+      - name: Load ProjectAccess module
+        uses: NeroGM/ProjectAccess@master
+
+      - name: Checkpoint
+        run: |
+          $eventName = '${{ github.event_name }}'
+          $contentID = ''
+
+          switch ($eventName) {
+            'pull_request' {
+              $contentType = 'pullRequest'
+              $contentID = '${{ github.event.pull_request.node_id }}'
+              $contentCreatedAt = '${{ github.event.pull_request.created_at }}'
+              $contentClosedAt = '${{ github.event.pull_request.closed_at }}'
+            }
+            'issues' {
+              $contentType = 'issue'
+              $contentID = '${{ github.event.issue.node_id }}'
+              $contentCreatedAt = '${{ github.event.issue.created_at }}'
+              $contentClosedAt = '${{ github.event.issue.closed_at }}'
+            }
+          }
+          
+          if ($contentID -ne '') {
+            $projectID = Request-ProjectData 1 -IDOnly
+            "projectID=$projectID" >> $Env:GITHUB_ENV
+
+            "contentType=$contentType" >> $Env:GITHUB_ENV
+            "contentID=$contentID" >> $Env:GITHUB_ENV
+            "contentCreatedAt=$contentCreatedAt" >> $Env:GITHUB_ENV
+            "contentClosedAt=$contentClosedAt" >> $Env:GITHUB_ENV
+            exit 0
+          } else {
+            exit 1
+          }
+        shell: pwsh
+
+      - name: Add PR/Issue to project
+        id: addItem
+        if: ${{ github.event.action == 'opened' }}
+        run: |
+          $response = Register-ProjectItem -ProjectID $Env:projectID -ContentID $Env:contentID
+          Write-Output "::set-output name=itemID::$($response.data.addF.item.id)"
+        shell: pwsh
+      
+      - name: Set item fields (Opened)
+        if: ${{ github.event.action == 'opened' }}
+        run: |
+          $itemID = '${{ steps.addItem.outputs.itemID }}'
+
+          # Setting date field
+          $dateFieldName = 'Date'
+          $dateField = Find-ProjectField -ProjectNumber 1 -FieldName $dateFieldName
+          $dateValue = if ($Env:contentType -eq 'pullRequest') {
+            $prNumber = ${{ github.event.pull_request.number }}
+            $res = Request-PullRequestCommit -RepositoryName 'NBase' -PullRequestNumber $prNumber -First 1
+            $committedDate = $res.data.viewer.repository.pullRequest.commits.edges[0].node.commit.committedDate
+
+            Write-Host "Pull request creation date: $ContentCreatedAt`nFirstCommitDate: $committedDate"
+
+            $date1 = Get-Date $Env:contentCreatedAt
+            $date2 = Get-Date $committedDate
+            if ($date1 -le $date2) { $Env:contentCreatedAt } else { $committedDate }
+          } else {
+            $Env:contentCreatedAt
+          }
+
+          Write-Host "Setting '$dateFieldName' to '$dateValue'."
+          Edit-ProjectItemField -ProjectID $Env:projectID -ItemID $itemID -FieldID ($dateField.id) -DateValue $dateValue
+          
+          # Setting iteration field
+          $itFieldName = '1W (Opened)'
+          $itField = Find-ProjectField -ProjectNumber 1 -FieldName $itFieldName
+          $itFieldValue = Get-ProjectFieldValue -Field $itField -Criteria $dateValue
+
+          Write-Host "Setting '$itFieldName' to '$($itFieldValue.title)'."
+          Edit-ProjectItemField -ProjectID $Env:projectID -ItemID $itemID -FieldID ($itField.id) -IterationIDValue ($itFieldValue.id)
+        shell: pwsh
+
+      - name: Set item fields (Closed)
+        if: ${{ github.event.action == 'closed' }}
+        run: |
+          $item = Find-ProjectItem -ProjectNumber 1 -ContentID $Env:contentID
+
+          # Setting date field
+          $dateFieldName = 'Date (Closed)'
+          $dateField = Find-ProjectField -ProjectNumber 1 -FieldName $dateFieldName
+          $dateValue = $Env:contentClosedAt
+          Write-Host "Setting '$dateFieldName' to '$dateValue'."
+          Edit-ProjectItemField -ProjectID $Env:projectID -ItemID ($item.id) -FieldID ($dateField.id) -DateValue $dateValue
+
+          # Setting iteration field
+          $itFieldName = '1W (Closed)'
+          $itField = Find-ProjectField -ProjectNumber 1 -FieldName $itFieldName
+          $itFieldValue = Get-ProjectFieldValue -Field $itField -Criteria $dateValue
+          Write-Host "Setting '$itFieldName' to '$($itFieldValue.title)'."
+          Edit-ProjectItemField -ProjectID $Env:projectID -ItemID ($item.id) -FieldID ($itField.id) -IterationIDValue ($itFieldValue.id)
+        shell: pwsh
+
+      - name: Set item fields (Reopened)
+        if: ${{ github.event.action == 'reopened' }}
+        run: |
+          $item = Find-ProjectItem -ProjectNumber 1 -ContentID $Env:contentID
+
+          # Setting date field
+          $dateValue = '0001-01-01' # How to assign empty value ??
+          $dateFieldName = 'Date (Closed)'
+          $dateField = Find-ProjectField -ProjectNumber 1 -FieldName $dateFieldName
+          Write-Host "Setting '$dateFieldName' to '$dateValue'."
+          Edit-ProjectItemField -ProjectID $Env:projectID -ItemID ($item.id) -FieldID ($dateField.id) -DateValue $dateValue
+
+          # Setting iteration field
+          $itFieldIDValueID = '5aa0ec08' # How to assign empty value ??
+          $itFieldName = '1W (Closed)'
+          $itField = Find-ProjectField -ProjectNumber 1 -FieldName $itFieldName
+          Write-Host "Setting '$itFieldName' to ''."
+          Edit-ProjectItemField -ProjectID $Env:projectID -ItemID ($item.id) -FieldID ($itField.id) -IterationIDValue $itFieldIDValueID
+        shell: pwsh
