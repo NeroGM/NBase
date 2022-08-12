@@ -132,8 +132,8 @@ class Shapes extends Shape {
      * Draws the debug visualizations of this instance by calling the `debugDraw`
      * functions of each shape in `union`.
      **/
-    public function debugDraw(?color:Int) {
-        for (shape in union) shape.debugDraw(color);
+    public function debugDraw(?lineColor:Int, lineAlpha:Float=1, ?fillColor:Int, fillAlpha:Float=1, alpha:Float=1) {
+        for (shape in union) shape.debugDraw(lineColor,lineAlpha,fillColor,fillAlpha,alpha);
     }
 
     /**

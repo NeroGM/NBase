@@ -33,9 +33,18 @@ class Circle extends Shape {
     public function containsPoint(p:Point):Bool return col.contains(p);
 
     /** Draws the debug visualizations of this instance. **/
-    public function debugDraw(?color:Int) {
+    public function debugDraw(?lineColor:Int, lineAlpha:Float=1, ?fillColor:Int, fillAlpha:Float=1, alpha:Float=1) {
         debugG.clear();
-        debugG.params.lineColor = color == null ? 0x880088 : color;
+
+        debugG.params.lineColor = lineColor == null ? 0x880088 : lineColor;
+        debugG.params.lineAlpha = lineAlpha;
+        if (fillColor != null) {
+            debugG.params.filled = true;
+            debugG.params.fillColor = fillColor;
+            debugG.params.fillAlpha = fillAlpha;
+        }
+        debugG.params.alpha = alpha;
+
         debugG.drawCircle(0,0,radius,0);
         debugG.drawLine(0,0,radius,0);
         if (children[children.length-1] != debugG) addChild(debugG);
