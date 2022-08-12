@@ -140,6 +140,14 @@ class Quad extends Rectangle {
         quadId = -1;
         return;
     }
+
+    override public function debugDraw(?lineColor:Int, lineAlpha:Float=1, ?fillColor:Int=0xFF00FF, fillAlpha:Float=0.05, alpha:Float=1) {
+        super.debugDraw(lineColor,lineAlpha,fillColor,fillAlpha,alpha);
+
+        for (quad in childQuads) {
+            quad.debugDraw(lineColor,lineAlpha,fillColor,fillAlpha,alpha);
+        }
+    }
 }
 
 @:allow(nb.phys.Quad)
