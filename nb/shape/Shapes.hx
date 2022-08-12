@@ -132,8 +132,8 @@ class Shapes extends Shape {
      * Draws the debug visualizations of this instance by calling the `debugDraw`
      * functions of each shape in `union`.
      **/
-    public function debugDraw(?color:Int) {
-        for (shape in union) shape.debugDraw(color);
+    public function debugDraw(?lineColor:Int, lineAlpha:Float=1, ?fillColor:Int, fillAlpha:Float=1, alpha:Float=1) {
+        for (shape in union) shape.debugDraw(lineColor,lineAlpha,fillColor,fillAlpha,alpha);
     }
 
     /**
@@ -179,8 +179,7 @@ class Shapes extends Shape {
         var segments:haxe.ds.Map<Polygon, Array<Segment>> = new haxe.ds.Map();
         var checkedSegs:Array<Array<Segment>> = [];
         
-        if (shapes.length < 1) return [];
-        else if (shapes.length == 1) return [new Polygon(cast(shapes[0],Polygon).points)];
+        if (shapes.length < 2) return null;
 
         // Make graph
         for (shape in shapes) if (shape is Polygon) {
