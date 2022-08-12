@@ -34,6 +34,7 @@ class Object extends h2d.Object {
 	 * by a children class.
 	 **/
 	public var size(default, null):Size = {w:0, h:0};
+	public var entity:nb.phys.Entity = null;
 
 	/** Whether `visible` was auto-toggled by this instance. **/
 	private var autoToggledVisibility:Bool = false;
