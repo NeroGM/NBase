@@ -145,8 +145,9 @@ class QuadTree extends Quad {
     private var nextQuadId:Int = 0;
     public var allElements:Map<Object,QTElement> = new Map();
 
-    override public function new(x:Float, y:Float, w:Float, h:Float, ?parent:Object) {
+    override public function new(x:Float, y:Float, w:Float, h:Float, ?parent:h2d.Object) {
         super(x,y,w,h,this,null);
+        parent.addChild(this);
     }
 
     public function addObject(o:Object) {
