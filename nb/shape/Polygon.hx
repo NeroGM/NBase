@@ -16,6 +16,8 @@ class Polygon extends Shape {
     /** Whether the right side of the segments of the polygon face inwards. **/
     public var rightSideFaceInside(default,null):Bool = false;
 
+    public var hideDebugDrawNormals:Bool = false;
+
     /**
      * Creates an `nb.shape.Polygon` instance.
      * 
@@ -51,11 +53,20 @@ class Polygon extends Shape {
     public function toSegments():h2d.col.Segments return points.toSegments();
 
     /** Draws the debug visualizations of this instance. **/
-    public function debugDraw(?color:Int) {
+    public function debugDraw(?lineColor:Int, lineAlpha:Float=1, ?fillColor:Int, fillAlpha:Float=1, alpha:Float=1) {
         debugG.clear();
-        debugG.params.lineColor = color == null ? 0x880088 : color;
+
+        debugG.params.lineColor = lineColor == null ? 0x880088 : lineColor;
+        debugG.params.lineAlpha = lineAlpha;
+        if (fillColor != null) {
+            debugG.params.filled = true;
+            debugG.params.fillColor = fillColor;
+            debugG.params.fillAlpha = fillAlpha;
+        }
+        debugG.params.alpha = alpha;
+
         debugG.drawPolygon(points);
-        for (segment in points.toSegments()) {
+        if (!hideDebugDrawNormals) for (segment in points.toSegments()) {
             var dx = segment.dx;
             var dy = segment.dy;
             var normal:Point = rightSideFaceInside ? new Point(-dy,dx).normalized() : new Point(dy,-dx).normalized();
