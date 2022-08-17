@@ -198,6 +198,33 @@ class Macros {
 			if( s.dom != null ) s.dom.onParentChanged();
 			#end
 		};
+
+
+
+		var newField:Field = {access:[APublic],name:"posChangedThisFrame",pos:Context.currentPos(),
+			kind:FProp('default','null',macro:Bool,macro false)
+		};
+		fields.push(newField);
+
+		var field:Field = nb.ext.ArrayExt.getOne(fields, (o) -> o.name == "set_x");
+		field.kind.getParameters()[0].expr = macro {
+			posChanged = true;
+			if (!posChangedThisFrame) {
+				posChangedThisFrame = true;
+				nb.Manager.objPosChanged.push(this);
+			}
+			return x = v;
+		}
+
+		var field:Field = nb.ext.ArrayExt.getOne(fields, (o) -> o.name == "set_y");
+		field.kind.getParameters()[0].expr = macro {
+			posChanged = true;
+			if (!posChangedThisFrame) {
+				posChangedThisFrame = true;
+				nb.Manager.objPosChanged.push(this);
+			}
+			return y = v;
+		}
 		
 		return fields;
 	}

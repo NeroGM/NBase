@@ -62,6 +62,9 @@ class Manager {
 
 	/** Whether this class should use traces. `true` by default if compiler flag `debug` is defined. **/
 	public static var logging:Bool = #if debug true #else false #end;
+
+	@:allow(h2d.Object)
+	private static var objPosChanged:Array<h2d.Object> = [];
 	
 	/** Initializes this class. It needs to be done once before being used and have `neroFS` set. **/
 	public static function init(app:hxd.App, ?w:Int=300, ?h:Int=300, onFinished:Void->Void) {
@@ -234,6 +237,9 @@ class Manager {
 		if (Key.aKeyUp.length != 0) Key.aKeyUp = [];
 		if (Key.ignoredKeys.length != 0) Key.ignoredKeys = [];
 		eventJustTriggered = false;
+
+		for (o in objPosChanged) o.posChangedThisFrame = false;
+		objPosChanged = [];
 	}
 
 	/** Returns the mouse coordinates on the scene. **/
