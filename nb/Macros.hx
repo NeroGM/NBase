@@ -209,7 +209,7 @@ class Macros {
 		var field:Field = nb.ext.ArrayExt.getOne(fields, (o) -> o.name == "set_x");
 		field.kind.getParameters()[0].expr = macro {
 			posChanged = true;
-			if (!posChangedThisFrame) {
+			if (!posChangedThisFrame && this.x != v) {
 				posChangedThisFrame = true;
 				nb.Manager.objPosChanged.push(this);
 			}
@@ -219,7 +219,7 @@ class Macros {
 		var field:Field = nb.ext.ArrayExt.getOne(fields, (o) -> o.name == "set_y");
 		field.kind.getParameters()[0].expr = macro {
 			posChanged = true;
-			if (!posChangedThisFrame) {
+			if (!posChangedThisFrame && this.y != v) {
 				posChangedThisFrame = true;
 				nb.Manager.objPosChanged.push(this);
 			}
