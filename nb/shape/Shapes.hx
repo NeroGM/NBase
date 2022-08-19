@@ -178,6 +178,8 @@ class Shapes extends Shape {
         var graph:Graph = new Graph(null,false,true);
         var segments:haxe.ds.Map<Polygon, Array<Segment>> = new haxe.ds.Map();
         var checkedSegs:Array<Array<Segment>> = [];
+
+        for (s in union) s.remove();
         
         if (shapes.length < 1) return [];
         else if (shapes.length == 1) {
