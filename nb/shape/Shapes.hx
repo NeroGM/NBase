@@ -180,7 +180,11 @@ class Shapes extends Shape {
         var checkedSegs:Array<Array<Segment>> = [];
         
         if (shapes.length < 1) return [];
-        else if (shapes.length == 1) return [new Polygon(cast(shapes[0],Polygon).points)];
+        else if (shapes.length == 1) {
+            var res:Array<Polygon> = [new Polygon(cast(shapes[0],Polygon).points)];
+            union = [cast(res[0],Shape)];
+            return res;
+        }
 
         // Make graph
         for (shape in shapes) if (shape is Polygon) {
