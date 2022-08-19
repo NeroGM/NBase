@@ -1,3 +1,5 @@
 -lib heaps
 -lib ase
 -lib nbase
+
+--macro addGlobalMetadata("h2d.Object","@:allow(nb.Manager)")
