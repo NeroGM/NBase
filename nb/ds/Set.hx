@@ -28,6 +28,10 @@ abstract Set<T>(Map<T,Bool>) {
         return this[item] = true;
 	}
 
+    public inline function remove(item:T):Bool {
+        return this.remove(item);
+    }
+
     /** Returns an iterator over the values of this set. The order is undefined. **/
     public inline function iterator():Iterator<T> {
         return this.keys();
