@@ -32,6 +32,14 @@ abstract Set<T>(Map<T,Bool>) {
         return this.remove(item);
     }
 
+    @:arrayAccess public inline function get(key:T):Null<Bool> {
+		return this.get(key);
+    }
+
+    @:arrayAccess public inline function set(key:T, value:Bool):Bool {
+        return value ? add(key) : remove(key);
+    }
+
     /** Returns an iterator over the values of this set. The order is undefined. **/
     public inline function iterator():Iterator<T> {
         return this.keys();
