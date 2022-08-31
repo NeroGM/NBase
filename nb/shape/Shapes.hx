@@ -185,6 +185,7 @@ class Shapes extends Shape {
         else if (shapes.length == 1) {
             var res:Array<Polygon> = [new Polygon(cast(shapes[0],Polygon).points)];
             union = [cast(res[0],Shape)];
+            addChild(union[0]);
             return res;
         }
 
