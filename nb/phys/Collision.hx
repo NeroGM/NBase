@@ -352,7 +352,6 @@ class Collision {
 		}
 
 		var justRemovedP:Point = null;
-		var forceEPA:Bool = false;
 		for (i in 0...1000) {			
 			switch (simplex.length) {
 				case 0: newTarget = minskDiff.points[0];
@@ -360,9 +359,45 @@ class Collision {
 				case 2:
 					newTarget = simplex.toSegments()[0].project(origin);
 
-					if (minskDiff.containsPoint(origin) && newTarget.equalEps(origin)) { // Fix for when newTarget == origin
-						newTarget = minskDiff.toSegments()[0].project(origin);
-						forceEPA = true; 
+					if (minskDiff.containsPoint(origin) && newTarget.equalEps(origin)) { // Fix for when simplex segment traverses origin
+						var segs = minskDiff.toSegments();
+
+						// If origin is on minskDiff edge, no need to go further, return (0,0).
+						var p1 = simplex[0];
+						var p2 = simplex[1];
+						for (seg in segs) {
+							var p3 = seg.getA();
+							var p4 = seg.getB();
+							if (checkSegments(p1,p2,p3,p4) == 2) {
+								return origin;
+							}
+						}
+
+						// Translate one of the simplex's points so that the segment doesn't intersect with the origin
+						var onSeg:Segment = null;
+						var segIndex:Int = -1;
+						for (seg in segs) {
+							segIndex++;
+							if (seg.getA().equals(simplex[0])) { onSeg = seg; break; }
+						}
+						var perc:Float = 0;
+						var segIndexInc:Int = 0;
+						var p:Point = null;
+						do {
+							perc += 0.05;
+							p = simplex[0].add(new Point(onSeg.dx*perc,onSeg.dy*perc));
+							newTarget = new Segment(p,simplex[1]).project(origin);
+
+							// Should happen only if using polygon with very close points
+							// Should very rarely happen, also `diff.convexHull()` doesn't return points at the same coords
+							if (perc == 1) {
+								perc = 0.05;
+								segIndexInc++;
+								onSeg = segs.at(segIndex+segIndexInc);
+								if (segIndexInc >= segs.length) throw "EPA max displacement reached.";
+							}
+						} while (newTarget.equalEps(origin));
+						simplex[0] = p;
 					}
 				case 3:
 					var segments = simplex.toSegments();
@@ -383,7 +418,7 @@ class Collision {
 					}
 
 					// EPA if true
-					if (simplex.contains(origin) || forceEPA) {
+					if (simplex.contains(origin)) {
 						var oValue:Point = null;
 						for (i in 0...1000) {
 							var p = getClosestProjection();
