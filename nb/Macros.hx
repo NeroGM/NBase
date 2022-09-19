@@ -162,6 +162,10 @@ class Macros {
 			}
 		}
 
+		var field:Field = nb.ext.ArrayExt.getOne(fields, (o) -> o.name == "toString");
+		field.meta.push({name:":keep", pos:field.pos});
+		field.meta.push({name:":keepSub", pos:field.pos});
+
 		var field:Field = nb.ext.ArrayExt.getOne(fields, (o) -> o.name == "addChildAt");
 		field.kind.getParameters()[0].expr = macro {
 			if( pos < 0 ) pos = 0;
