@@ -23,9 +23,9 @@ Put the release in a folder so that your project can find the executable. (See `
 
 Install hashlink dependencies:
 ```
-haxelib install hlopenal
-haxelib install hlsdl
-haxelib install hldx
+haxelib install hlopenal 1.5.0
+haxelib install hlsdl 1.10.0
+haxelib install hldx 1.10.0
 ```
 
 ## Quick start a project
